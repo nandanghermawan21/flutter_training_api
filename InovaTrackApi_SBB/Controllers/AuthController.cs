@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using InovaTrackApi_SBB.Models;
+﻿using InovaTrackApi_SBB.Model;
+using InovaTrackApi_SBB.Context;
 using InovaTrackApi_SBB.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InovaTrackApi_SBB.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -20,15 +16,17 @@ namespace InovaTrackApi_SBB.Controllers
             this.authService = authService;
         }
 
-        [HttpGet]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult Test()
-        {
-            return Ok("Hello World!");
-        }
+        //[Route("test")]
+        //[HttpGet]
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //public IActionResult Test()
+        //{
+        //    return Ok("Hello World!");
+        //}
 
+        [Route("user-login")]
         [HttpPost]
-        public ActionResult Login([FromBody]LoginParams request)
+        public ActionResult Login([FromBody]UserLoginModel request)
         {
             var user = authService.Authenticate(request.UserName, request.Password);
 
@@ -44,19 +42,36 @@ namespace InovaTrackApi_SBB.Controllers
             });
         }
 
-        [HttpGet]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult GetUser([FromQuery] LoginParams request)
-        {
-            User user = new User();
-            return Ok(new { user = user });
-        }
+        //[Route("get-user")]
+        //[HttpGet]
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //public IActionResult GetUser([FromQuery]UserLoginModel request)
+        //{
+        //    User user = new User();
+        //    return Ok(new { user = user });
+        //}
 
+        [Route("logout")]
         [HttpPost]
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult Logout()
         {
             return Ok(new { status = "OK" });
+        }
+
+        [Route("customer-login")]
+        [HttpPost]
+        public ActionResult CustomerLogin([FromBody]CustomerLoginModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var customer = authService.AuthenticateCustomer(request.Email, request.Password);
+
+            if (customer == null)
+                return BadRequest(new { message = "Email or Password is incorrect" });
+
+            return Ok(customer);
         }
     }
 }
