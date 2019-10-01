@@ -1,20 +1,19 @@
 ﻿using InovaTrackApi_SBB.Helper;
-using InovaTrackApi_SBB.Models;
+using InovaTrackApi_SBB.Context;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace InovaTrackApi_SBB.Services
 {
     public interface IAuthService
     {
         User Authenticate(string username, string password);
+        Customer AuthenticateCustomer(string email, string password);
     }
 
     public class AuthService : IAuthService
@@ -58,5 +57,36 @@ namespace InovaTrackApi_SBB.Services
             return user;
         }
 
+        public Customer AuthenticateCustomer(string email, string password)
+        {
+            var hash = PasswordHasher.Hash(email, password);
+            var customer = db.Customers.SingleOrDefault(x => x.Email == email && x.Password == hash && x.IsDeleted != true);
+
+            // return null if user not found
+            if (customer == null)
+                return null;
+
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var expiredTime = DateTime.UtcNow.AddDays(7);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Email, customer.CustomerId.ToString())
+                }),
+                Expires = expiredTime,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            customer.Token = tokenHandler.WriteToken(token);
+
+            // remove password before returning
+            customer.Password = null;
+            customer.TokenExpiredTime = expiredTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+            return customer;
+        }
     }
 }

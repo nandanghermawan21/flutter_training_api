@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InovaTrackApi_SBB.Models
+namespace InovaTrackApi_SBB.Context
 {
     public class LoginParams
     {

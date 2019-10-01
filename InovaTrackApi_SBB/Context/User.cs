@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InovaTrackApi_SBB.Models
+namespace InovaTrackApi_SBB.Context
 {
     [Table("users")]
     public class User
