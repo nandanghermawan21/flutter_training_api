@@ -1,16 +1,22 @@
-﻿using InovaTrackApi_SBB.Helper;
-using InovaTrackApi_SBB.Context;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using InovaTrackApi_SBB.Helper;
+using InovaTrackApi_SBB.Models;
 using InovaTrackApi_SBB.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Swagger;
-using System.Text;
 
 namespace InovaTrackApi_SBB
 {
@@ -58,14 +64,6 @@ namespace InovaTrackApi_SBB
 
             services.AddScoped<IAuthService, AuthService>();
 
-            services.AddSwaggerGen(x =>
-            {
-                x.SwaggerDoc("v1", new Info
-                {
-                    Title = "SBI API"
-                });
-                x.OperationFilter<SwaggerHeader>();
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,11 +89,6 @@ namespace InovaTrackApi_SBB
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseStaticFiles();
-            app.UseSwagger();
-            app.UseSwaggerUI(x =>
-            {
-                x.SwaggerEndpoint("../swagger/v1/swagger.json", "SBI Core API");
-            });
 
             app.UseMvc(routes =>
             {
@@ -103,6 +96,7 @@ namespace InovaTrackApi_SBB
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }
