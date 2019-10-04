@@ -10,25 +10,18 @@ namespace InovaTrackApi_SBB.Models
         [Key]
         [Column("id_payment")]
         public long PaymentId { get; set; }
-
         [Column("pay_date")]
         public DateTime? PaymentDate { get; set; }
-
         [Column("customer_email")]
         public string Email { get; set; }
-
         [Column("paid_amount")]
         public decimal? Amount { get; set; }
-
         [Column("shipment_number")]
         public string ShipmentNumber { get; set; }
-
         [Column("ticket_no")]
         public string TicketNumber { get; set; }
-
         [Column("paid_status")]
         public byte? PaymentStatus { get; set; }
-
         [Column("remarks")]
         public string Remarks { get; set; }
     }

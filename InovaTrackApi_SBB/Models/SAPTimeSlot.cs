@@ -10,13 +10,10 @@ namespace InovaTrackApi_SBB.Models
         [Key]
         [Column("slotid")]
         public int SlotId { get; set; }
-
         [Column("batching_plant_id")]
         public int? BatchingPlantId { get; set; }
-
         [Column("timeslot")]
         public DateTime Time { get; set; }
-
         [Column("remarks")]
         public string Remarks { get; set; }
     }

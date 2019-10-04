@@ -9,10 +9,8 @@ namespace InovaTrackApi_SBB.Models
         [Key]
         [Column("grade_code")]
         public string GradeCode { get; set; }
-
         [Column("grade_name")]
         public string GradeName { get; set; }
-
         [Column("remarks")]
         public string Remarks { get; set; }
     }
