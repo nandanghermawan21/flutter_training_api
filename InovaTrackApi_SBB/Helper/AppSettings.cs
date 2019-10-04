@@ -13,5 +13,10 @@ namespace InovaTrackApi_SBB.Helper
         public string EmailHost { get; set; }
         public int EmailPort { get; set; }
         public int ResetPasswordExpiredTime { get; set; }
+        public string GinotaApiKey { get; set; }
+        public string GinotaApiSecreet { get; set; }
+        public string GinotaSender { get; set; }
+
+
     }
 }

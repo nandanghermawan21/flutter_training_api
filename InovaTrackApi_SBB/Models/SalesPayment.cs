@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InovaTrackApi_SBB.Context
+namespace InovaTrackApi_SBB.Models
 {
     [Table("sales_payment")]
     public class SalesPayment

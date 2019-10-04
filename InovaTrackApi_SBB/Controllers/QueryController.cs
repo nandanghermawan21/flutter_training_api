@@ -1,7 +1,7 @@
 ﻿using GeoCoordinatePortable;
-using InovaTrackApi_SBB.Model;
+using InovaTrackApi_SBB.DataModel;
 using InovaTrackApi_SBB.Helper;
-using InovaTrackApi_SBB.Context;
+using InovaTrackApi_SBB.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;

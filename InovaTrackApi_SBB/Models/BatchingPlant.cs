@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InovaTrackApi_SBB.Context
+namespace InovaTrackApi_SBB.Models
 {
     [Table("batching_plant")]
     public class BatchingPlant
@@ -18,7 +18,7 @@ namespace InovaTrackApi_SBB.Context
         [Column("lat")]
         public double? Lat { get; set; }
         [Column("radius")]
-        public int? Address1 { get; set; }
+        public int? radius { get; set; }
         [Column("daily_target_trips")]
         public int? DailyTargetTrips { get; set; }
         [Column("daily_target_volume")]

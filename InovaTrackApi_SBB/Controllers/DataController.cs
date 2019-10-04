@@ -1,4 +1,4 @@
-﻿using InovaTrackApi_SBB.Context;
+﻿using InovaTrackApi_SBB.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;

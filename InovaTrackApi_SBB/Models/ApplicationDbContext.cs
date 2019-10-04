@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace InovaTrackApi_SBB.Context
+namespace InovaTrackApi_SBB.Models
 
 {
     public class ApplicationDbContext : DbContext

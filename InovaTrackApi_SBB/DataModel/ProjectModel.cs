@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace InovaTrackApi_SBB.Model
+namespace InovaTrackApi_SBB.DataModel
 {
     public class ProjectModel
     {

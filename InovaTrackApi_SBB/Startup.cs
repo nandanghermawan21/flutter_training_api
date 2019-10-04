@@ -1,5 +1,5 @@
 ﻿using InovaTrackApi_SBB.Helper;
-using InovaTrackApi_SBB.Context;
+using InovaTrackApi_SBB.Models;
 using InovaTrackApi_SBB.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
