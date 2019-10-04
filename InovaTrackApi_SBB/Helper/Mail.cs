@@ -37,7 +37,7 @@ namespace InovaTrackApi_SBB.Helper
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }
