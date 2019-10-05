@@ -9,10 +9,8 @@ namespace InovaTrackApi_SBB.Models
         [Key]
         [Column("slump_code")]
         public string SlumpCode { get; set; }
-
         [Column("slump_name")]
         public string SlumpName { get; set; }
-
         [Column("remarks")]
         public string Remarks { get; set; }
     }

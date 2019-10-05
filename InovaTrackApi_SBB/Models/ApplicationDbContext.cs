@@ -20,5 +20,7 @@ namespace InovaTrackApi_SBB.Models
         public DbSet<SAPTimeSlot> SAPTimeSlots { get; set; }
         public DbSet<SAPProductMaterial> SAPProductMaterials { get; set; }
         public DbSet<SalesPayment> SalesPayments { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
+
     }
 }

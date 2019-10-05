@@ -9,22 +9,16 @@ namespace InovaTrackApi_SBB.Models
         [Key]
         [Column("material_id")]
         public long MaterialId { get; set; }
-
         [Column("sap_material")]
         public long? SAPMaterial { get; set; }
-
         [Column("material_description")]
         public string Description { get; set; }
-
         [Column("mtype")]
         public string Type { get; set; }
-
         [Column("price")]
         public decimal Price { get; set; }
-
         [Column("grade_code")]
         public string GradeCode { get; set; }
-
         [Column("structure_code")]
         public string StructureCode { get; set; }
     }
