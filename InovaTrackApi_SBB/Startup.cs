@@ -4,18 +4,22 @@ using InovaTrackApi_SBB.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Globalization;
 using System.Text;
 
 namespace InovaTrackApi_SBB
 {
     public class Startup
     {
+        public Resource resource;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -88,6 +92,14 @@ namespace InovaTrackApi_SBB
                 .AllowAnyHeader();
             });
 
+            app.MapWhen(
+                delegate (HttpContext context)
+                {
+                    handleRequest(context);
+                    return false;
+                }, handleMapWhen
+                );
+
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseStaticFiles();
@@ -103,6 +115,32 @@ namespace InovaTrackApi_SBB
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private void handleMapWhen(IApplicationBuilder app)
+        {
+
+        }
+
+        //handle request untuk set culture info karena ada issue al.exe not found 
+        //saat menggunakan resource .resx pada system globalization 
+        //jadi diganti dengan sistem resource class 
+        private void handleRequest(HttpContext context)
+        {
+            //set default culture
+            CultureInfo culture = new CultureInfo("id-ID");
+
+            //read header
+            culture = !string.IsNullOrEmpty(context.Request.Headers["lang"].ToString()) ? new CultureInfo(context.Request.Headers["lang"]) : culture;
+
+            //read query string
+            culture = !string.IsNullOrEmpty(context.Request.Query["lang"].ToString()) ? new CultureInfo(context.Request.Query["lang"]) : culture;
+
+            //set culture
+            CultureInfo.CurrentCulture = culture;
+
+            //set resource
+            resource = Resource.Instance(CultureInfo.CurrentCulture.Name.Split('-')[0]);
         }
     }
 }
