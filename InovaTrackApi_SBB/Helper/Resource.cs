@@ -21,9 +21,11 @@ namespace InovaTrackApi_SBB.Helper
             public string pleaseDoNotShareThisCodeWithAnyone = "please do not share this code with anyone";
             public string success = "Success";
             public string smsFailedToSend = "SMS failed to send";
-            public string customerNotFound = "customer not found";
+            public string customerNotFound = "Customer not found";
             public string newPasswordMustBeAtLeast8CharacterLong = "New passwords must be at least 8 characters long";
             public string phoneNumberRegistered = "Phone number is registered";
+            public string emailAlreadyRegistered = "Email already registered";
+            public string registerSuccess = "Registration successful";
         }
         #endregion
 
@@ -73,6 +75,8 @@ namespace InovaTrackApi_SBB.Helper
                     customerNotFound = "Pelanggan tidak ditemukan",
                     newPasswordMustBeAtLeast8CharacterLong = "Password baru minimal 8 karakter",
                     phoneNumberRegistered = "No telepon telah terdaftar",
+                    emailAlreadyRegistered = "Email telah terdaftar",
+                    registerSuccess = "Registrasi berhasil",
                 };
             }
         }

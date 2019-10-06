@@ -175,9 +175,9 @@ namespace InovaTrackApi_SBB.Controllers
                 return BadRequest(ModelState);
 
             if (data.Password.Length < 8)
-                ModelState.AddModelError("NewPassword", "Password has to be at least 8 characters in length");
+                ModelState.AddModelError("NewPassword", $"{GlobalData.get.resource.newPasswordMustBeAtLeast8CharacterLong}");
             else if (data.Password != data.ConfirmPassword)
-                ModelState.AddModelError("ConfirmPassword", "Password confirmation does not match");
+                ModelState.AddModelError("ConfirmPassword", $"{GlobalData.get.resource.confirmPaswordNotMatch}");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -185,12 +185,12 @@ namespace InovaTrackApi_SBB.Controllers
             //chek phone exist
             var customer = _customer.CheckPhoneExist(data.MobileNumber);
             if (customer != null)
-                return BadRequest("telepon telah terdaftar");
+                return BadRequest($"{GlobalData.get.resource.phoneNumberRegistered}");
 
             //chek email exist
             customer = await _db.Customers.FirstOrDefaultAsync(m => m.Email == data.Email);
             if (customer != null)
-                return BadRequest("email sudah terdaftar");
+                return BadRequest($"{GlobalData.get.resource.emailAlreadyRegistered}");
 
             try
             {
@@ -204,7 +204,7 @@ namespace InovaTrackApi_SBB.Controllers
                 };
                 _db.Customers.Add(model);
                 await _db.SaveChangesAsync();
-                return Ok("Customer created");
+                return Ok($"{GlobalData.get.resource.registerSuccess}");
             }
             catch (Exception ex)
             {
@@ -218,12 +218,11 @@ namespace InovaTrackApi_SBB.Controllers
         {
             try
             {
-                var customers = _db.Customers.Where((c) => c.MobileNumber == phoneNumber
-               || (!String.IsNullOrEmpty(c.MobileNumber) ? "62" + c.MobileNumber.Substring(1) : "") == phoneNumber).FirstOrDefault();
+                var customers = _customer.CheckPhoneExist(phoneNumber);
 
                 return Ok(new
                 {
-                    customerId = customers.CustomerId,
+                    customerId = customers != null ? customers.CustomerId : 0,
                     phoneNumber = phoneNumber,
                     statusString = customers == null ? GlobalData.get.resource.phoneNotFound : $"{GlobalData.get.resource.phoneNumberRegistered}",
                     statusCode = customers != null ? true : false
