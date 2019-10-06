@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\AccountController.cs" />
+    <Compile Remove="Controllers\DataController.cs" />
+    <Compile Remove="Controllers\ManageController.cs" />
+    <Compile Remove="Controllers\QueryController.cs" />
     <Compile Remove="Controllers\UserController.cs" />
     <Compile Remove="Controllers\ValuesController.cs" />
   </ItemGroup>

@@ -167,7 +167,7 @@ namespace InovaTrackApi_SBB.Controllers
             }
         }
 
-        [Route("customer-register")]
+        [Route("register")]
         [HttpPost]
         public async Task<ActionResult> CustomerRegisterAsync(CustomerRegisterModel data)
         {
@@ -212,7 +212,7 @@ namespace InovaTrackApi_SBB.Controllers
             }
         }
 
-        [Route("customer-checkphoneexist")]
+        [Route("checkphoneexist")]
         [HttpGet]
         public ActionResult CheckPhoneNUmberExist(string phoneNumber)
         {

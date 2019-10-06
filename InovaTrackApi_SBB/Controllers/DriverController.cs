@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,18 +14,15 @@ namespace InovaTrackApi_SBB.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class DriverController : ControllerBase
     {
         private ApplicationDbContext _db;
         private readonly AppSettings _config;
-        private CustomerModel _customer;
 
-
-        public AccountController(ApplicationDbContext db, IOptions<AppSettings> config)
+        public DriverController(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
             _config = config.Value;
-            _customer = new CustomerModel(db, config);
         }
 
         [Route("forgot-password")]
@@ -141,5 +139,6 @@ namespace InovaTrackApi_SBB.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
     }
 }
