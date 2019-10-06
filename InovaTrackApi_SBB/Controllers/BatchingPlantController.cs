@@ -23,7 +23,7 @@ namespace InovaTrackApi_SBB.Controllers
             _db = db;
         }
 
-        [Route("get-all")]
+        [Route("get")]
         [HttpGet]
         public ActionResult BatchingPlants()
         {

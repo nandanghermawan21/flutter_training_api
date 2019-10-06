@@ -39,7 +39,7 @@ namespace InovaTrackApi_SBB.Controllers
                 ResponeModel()
                 {
                     phoneNumber = phoneNumber,
-                    statusString = "no telepon tidak terdaftar",
+                    statusString = $"{GlobalData.get.resource.phoneNumberNotRegistered}",
                     email = "",
                     statusCode = 0,
                     data = { }
@@ -62,7 +62,7 @@ namespace InovaTrackApi_SBB.Controllers
                     phoneNumber = phoneNumber,
                     flash = false,
                     senderName = _config.GinotaSender,
-                    content = $"Berikut kode untuk reset password anda {code} mohon tidak memberitahukan kode ini kepada siapapun",
+                    content = $"{GlobalData.get.resource.thereIsTheCodeToResetYourPassword} {code} {GlobalData.get.resource.pleaseDoNotShareThisCodeWithAnyone}",
                 });
 
                 if (a != null)
@@ -71,7 +71,7 @@ namespace InovaTrackApi_SBB.Controllers
                     ResponeModel
                     {
                         phoneNumber = phoneNumber,
-                        statusString = "success",
+                        statusString = $"{GlobalData.get.resource.success}",
                         statusCode = 1,
                         data = { },
                         email = customer.Email
@@ -83,7 +83,7 @@ namespace InovaTrackApi_SBB.Controllers
                     ResponeModel
                     {
                         phoneNumber = phoneNumber,
-                        statusString = "gagal mengirim sms",
+                        statusString = $"{GlobalData.get.resource.smsFailedToSend}",
                         statusCode = 0,
                         data = { },
                         email = customer.Email
@@ -119,15 +119,15 @@ namespace InovaTrackApi_SBB.Controllers
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,
                     statusCode = 0,
-                    statusString = "pelanggan tidak ditemukan"
+                    statusString = ""
 
                 });
 
             if (data.NewPassword.Length < 8)
-                ModelState.AddModelError("message", "Password baru minimal 8 karakter");
+                ModelState.AddModelError("message", $"{GlobalData.get.resource.newPasswordMustBeAtLeast8CharacterLong}");
 
             else if (data.NewPassword != data.ConfirmPassword)
-                ModelState.AddModelError("message", "Konfirmasi password tidak sama");
+                ModelState.AddModelError("message", $"{GlobalData.get.resource.confirmPaswordNotMatch}");
 
             if (!ModelState.IsValid)
                 return BadRequest(new ResponeModel
@@ -135,7 +135,7 @@ namespace InovaTrackApi_SBB.Controllers
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,
                     statusCode = 0,
-                    statusString = "data tidak valid",
+                    statusString = $"{GlobalData.get.resource.invalidData}",
                     data = ModelState,
                 });
 
@@ -150,7 +150,7 @@ namespace InovaTrackApi_SBB.Controllers
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,
                     statusCode = 1,
-                    statusString = "password berhasil diubah",
+                    statusString = $"{GlobalData.get.resource.passwordDuccessfullyChanged}",
                     data = { },
                 });
             }
@@ -226,7 +226,7 @@ namespace InovaTrackApi_SBB.Controllers
                 {
                     customerId = customers.CustomerId,
                     phoneNumber = phoneNumber,
-                    statusString = customers != null ? Resource.Instance().phoneNotFound : "not Exist",
+                    statusString = customers != null ? GlobalData.get.resource.phoneNotFound : $"{GlobalData.get.resource.phoneNumberRegistered}",
                     statusCode = customers != null ? true : false
                 });
             }

@@ -27,7 +27,7 @@ namespace InovaTrackApi_SBB.Controllers
             _config = config.Value;
         }
 
-        [Route("get-all")]
+        [Route("get")]
         [HttpGet]
         public ActionResult Projects(string status = null)
         {

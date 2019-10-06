@@ -11,24 +11,11 @@ namespace InovaTrackApi_SBB.Helper
         private static Resource instance = null;
         private static string currentLang = "";
 
-        #region default resource
-        //parameter resource
-        public string phoneNotFound = "phone number not found";
-        #endregion
+        #region contructor
+        public Resource() { }
 
-        #region resource bahasa indonesia
-        //function to set resource
-        private void id()
+        public Resource(string id)
         {
-           phoneNotFound = "No telepon tidak ditemukan";
-        }
-        #endregion
-
-        #region siggleton setting
-        private Resource(string id = "")
-        {
-            //string id = culture.Name.Split('-')[0];
-
             switch (id)
             {
                 case "id":
@@ -36,16 +23,47 @@ namespace InovaTrackApi_SBB.Helper
                     break;
             }
         }
-        public static Resource Instance(string lang = "")
+        #endregion
+
+        #region default resource
+        //parameter resource
+        public string phoneNotFound = "phone number not found";
+        public string passwordDuccessfullyChanged = "Password successfully changed";
+        public string invalidData = "Invalid data";
+        public string confirmPaswordNotMatch = "Confirm password is not match";
+        public string phoneNumberNotRegistered = "Phone number not registered";
+        public string thereIsTheCodeToResetYourPassword = "There is the code to reset your password";
+        public string pleaseDoNotShareThisCodeWithAnyone = "please do not share this code with anyone";
+        public string success = "Success";
+        public string smsFailedToSend = "SMS failed to send";
+        public string customerNotFound = "customer not found";
+        public string newPasswordMustBeAtLeast8CharacterLong = "New passwords must be at least 8 characters long"
+        public string phoneNumberRegistered = "Phone number is registered";
+        public string 
+        #endregion
+
+        #region resource bahasa indonesia
+        //function to set resource
+        public Resource id()
         {
-            lang = string.IsNullOrEmpty(lang) ? currentLang : lang;
-            if (instance == null || currentLang != lang)
+            return new Resource()
             {
-                currentLang = lang;
-                instance = new Resource(lang);
-            }
-            return instance;
+                phoneNotFound = "No telepon tidak ditemukan",
+                passwordDuccessfullyChanged = "Kata sandi berhasil diubah",
+                invalidData = "Data tidak valid",
+                confirmPaswordNotMatch = "Konfirmasi kata sandi tidak cocok",
+                phoneNumberNotRegistered = "No telepon tidak terdaftar",
+                thereIsTheCodeToResetYourPassword = "Berikut ada adalah kode untuk mereset password anda",
+                pleaseDoNotShareThisCodeWithAnyone = "mohon tidak memberitahukan kode ini kepada siapapun",
+                success = "sukses",
+                smsFailedToSend = "Gagal mengirim sms",
+                customerNotFound = "Pelanggan tidak ditemukan",
+                newPasswordMustBeAtLeast8CharacterLong = "Password baru minimal 8 karakter",
+                phoneNumberRegistered = "No telepon telah terdaftar",
+
+            };
         }
+
         #endregion
     }
 }

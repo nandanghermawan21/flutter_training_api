@@ -139,8 +139,10 @@ namespace InovaTrackApi_SBB
             //set culture
             CultureInfo.CurrentCulture = culture;
 
-            //set resource
-            resource = Resource.Instance(CultureInfo.CurrentCulture.Name.Split('-')[0]);
+            //init global data
+            GlobalData data = new GlobalData();
+            data.resource = new Resource(CultureInfo.CurrentCulture.Name.Split('-')[0]);
+            
         }
     }
 }

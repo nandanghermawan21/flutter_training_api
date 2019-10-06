@@ -21,7 +21,7 @@ namespace InovaTrackApi_SBB.Controllers
             _config = config.Value;
         }
 
-        [Route("get-all")]
+        [Route("get")]
         [HttpGet]
         public ActionResult TimeSlots()
         {
