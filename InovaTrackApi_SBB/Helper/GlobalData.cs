@@ -5,12 +5,11 @@ using System.Threading.Tasks;
 
 namespace InovaTrackApi_SBB.Helper
 {
-    public sealed class GlobalData
+    public class GlobalData
     {
         private static GlobalData Get = null;
-        private static readonly object padlock = new object();
 
-        public Resource resource = new Resource();
+        public Resource.ResourceData resource { get;  set; }
 
         public GlobalData()
         {
@@ -22,12 +21,8 @@ namespace InovaTrackApi_SBB.Helper
             {
                 if (Get == null)
                 {
-                    lock (padlock)
                     {
-                        if (Get == null)
-                        {
-                            Get = new GlobalData();
-                        }
+                        Get = new GlobalData();
                     }
                 }
                 return Get;

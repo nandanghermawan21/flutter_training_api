@@ -221,12 +221,11 @@ namespace InovaTrackApi_SBB.Controllers
                 var customers = _db.Customers.Where((c) => c.MobileNumber == phoneNumber
                || (!String.IsNullOrEmpty(c.MobileNumber) ? "62" + c.MobileNumber.Substring(1) : "") == phoneNumber).FirstOrDefault();
 
-
                 return Ok(new
                 {
                     customerId = customers.CustomerId,
                     phoneNumber = phoneNumber,
-                    statusString = customers != null ? GlobalData.get.resource.phoneNotFound : $"{GlobalData.get.resource.phoneNumberRegistered}",
+                    statusString = customers == null ? GlobalData.get.resource.phoneNotFound : $"{GlobalData.get.resource.phoneNumberRegistered}",
                     statusCode = customers != null ? true : false
                 });
             }
