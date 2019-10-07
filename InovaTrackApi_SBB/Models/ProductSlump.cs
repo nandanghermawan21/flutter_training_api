@@ -15,3 +15,4 @@ namespace InovaTrackApi_SBB.Models
         public string Remarks { get; set; }
     }
 }
+

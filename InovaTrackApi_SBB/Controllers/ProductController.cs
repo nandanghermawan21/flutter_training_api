@@ -1,12 +1,12 @@
-﻿using InovaTrackApi_SBB.Helper;
+﻿using InovaTrackApi_SBB.DataModel;
+using InovaTrackApi_SBB.Helper;
 using InovaTrackApi_SBB.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace InovaTrackApi_SBB.Controllers
 {
@@ -17,11 +17,13 @@ namespace InovaTrackApi_SBB.Controllers
     {
         private ApplicationDbContext _db;
         private readonly AppSettings _config;
+        private ProductModel _product;
 
         public ProductController(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
             _config = config.Value;
+            _product = new ProductModel(db, config);
         }
 
         [Route("slumps")]
@@ -64,7 +66,7 @@ namespace InovaTrackApi_SBB.Controllers
         [HttpGet]
         public ActionResult ProjectStructureTypes()
         {
-            var data = _db.ProjectStructureTypes.OrderBy(m => m.StructureCode).ToList();
+            var data = _db.ProductStructureType.OrderBy(m => m.StructureCode).ToList();
             return Ok(data);
         }
 
@@ -72,29 +74,41 @@ namespace InovaTrackApi_SBB.Controllers
         [HttpGet]
         public ActionResult ProjectStructureTypes(string code)
         {
-            var data = _db.ProjectStructureTypes.FirstOrDefault(m => m.StructureCode == code);
+            var data = _db.ProductStructureType.FirstOrDefault(m => m.StructureCode == code);
             if (data == null)
                 return BadRequest(new { message = "Product Structure Type not found" });
             return Ok(data);
         }
 
-        [Route("materials")]
+        [Route("get")]
         [HttpGet]
-        public ActionResult ProductMaterials()
+        public ActionResult ProductMaterials(long? id = null)
         {
-            var data = _db.SAPProductMaterials.OrderBy(m => m.SAPMaterial).ToList();
-            return Ok(data);
+            try
+            {
+                var data = _product.get(id: id, imageIncluded: true);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
-        [Route("materials/{id}")]
+        [Route("structure/{structureCode}")]
         [HttpGet]
-        public ActionResult ProductMaterials(int id)
+        public ActionResult ProductByStructurType(string structureCode)
         {
-            var data = _db.SAPProductMaterials.FirstOrDefault(m => m.MaterialId == id);
-            if (data == null)
-                return BadRequest(new { message = "Product Material not found" });
-            return Ok(data);
-        }
+            try
+            {
+                var data = _product.get(structureCode: structureCode, imageIncluded: false);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
 
+        }
     }
 }

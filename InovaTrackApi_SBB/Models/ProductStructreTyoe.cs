@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace InovaTrackApi_SBB.Models
 {
     [Table("product_structure_type")]
-    public class ProjectStructureType
+    public class ProductStructreTyoe
     {
         [Key]
         [Column("structure_code")]

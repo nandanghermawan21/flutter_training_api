@@ -26,6 +26,7 @@ namespace InovaTrackApi_SBB.Helper
             public string phoneNumberRegistered = "Phone number is registered";
             public string emailAlreadyRegistered = "Email already registered";
             public string registerSuccess = "Registration successful";
+            public string productNotFound = "Product Material not found";
         }
         #endregion
 
@@ -77,6 +78,7 @@ namespace InovaTrackApi_SBB.Helper
                     phoneNumberRegistered = "No telepon telah terdaftar",
                     emailAlreadyRegistered = "Email telah terdaftar",
                     registerSuccess = "Registrasi berhasil",
+                    productNotFound = "Product tidak ditemukan",
                 };
             }
         }
