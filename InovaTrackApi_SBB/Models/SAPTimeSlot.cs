@@ -13,7 +13,7 @@ namespace InovaTrackApi_SBB.Models
         [Column("batching_plant_id")]
         public int? BatchingPlantId { get; set; }
         [Column("timeslot")]
-        public DateTime Time { get; set; }
+        public TimeSpan Time { get; set; }
         [Column("remarks")]
         public string Remarks { get; set; }
     }

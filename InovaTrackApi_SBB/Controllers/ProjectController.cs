@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace InovaTrackApi_SBB.Controllers
 {
@@ -20,54 +21,110 @@ namespace InovaTrackApi_SBB.Controllers
     {
         private ApplicationDbContext _db;
         private readonly AppSettings _config;
+        private ProjectModel _projectModel;
 
         public ProjectController(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
             _config = config.Value;
+            _projectModel = new ProjectModel(db, config);
         }
 
         [Route("get")]
         [HttpGet]
-        public ActionResult Projects(string status = null)
+        public ActionResult Projects(int? customerid = null, string id = null)
         {
-            return Ok("");
+            try
+            {
+                //claim user to get actor
+                var source = User.FindFirst(ClaimTypes.Actor)?.Value;
+                string salesid = null;
+
+                switch (source)
+                {
+                    case Projectsource.customer:
+                        customerid = int.Parse(User.FindFirst(ClaimTypes.Email)?.Value);
+                        break;
+
+                    case Projectsource.sales:
+                        salesid = User.FindFirst(ClaimTypes.Email)?.Value;
+                        break;
+                }
+
+                var data = _projectModel.get(customerId: customerid, salesId: salesid, id: id);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
-        [Route("get/{id}")]
-        [HttpGet]
-        public ActionResult Projects(int id)
-        {
-            return Ok("data");
-        }
 
         [Route("create")]
         [HttpPost]
-        public ActionResult CreateProject(ProjectModel data)
+        public ActionResult CreateProject(ProjectModel.CreateModel data, int? customerId = null, short? status = null)
         {
-            return Ok("Project created");
-        }
-
-        [Route("update/{id}")]
-        [HttpPost]
-        public ActionResult UpdateProject(ProjectModel data, int id)
-        {
-            return Ok("Project updated");
-        }
-
-        private string GenerateShipmentNumber()
-        {
-            int index = 1;
-            string lft = "SBI-" + DateTime.Today.ToString("yyyyMM");
-            string rgt = index.ToString().PadLeft(5, '0');
-            string shipmentNumber = lft + rgt;
-            while (_db.SAPShipments.Where(m => m.ShipmentNumber == shipmentNumber).FirstOrDefault() != null)
+            try
             {
-                index++;
-                rgt = index.ToString().PadLeft(5, '0');
-                shipmentNumber = lft + rgt;
+                //claim user to get actor
+                var project = new ProjectModel();
+                project.readParamFromObj(data);
+                project.param.source = User.FindFirst(ClaimTypes.Actor)?.Value;
+                switch (project.param.source)
+                {
+                    case Projectsource.customer:
+                        project.param.customerId = int.Parse(User.FindFirst(ClaimTypes.Email)?.Value);
+                        break;
+
+                    case Projectsource.sales:
+                        project.param.salesId = User.FindFirst(ClaimTypes.Email)?.Value;
+                        project.param.customerId = customerId;
+                        break;
+                }
+
+                if (status.HasValue)
+                {
+                    project.param.projectStatus = status.Value;
+                }
+
+                project.setDb(_db).create();
+
+                return Ok(project.param);
             }
-            return shipmentNumber;
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
+
+        [Route("update")]
+        [HttpPost]
+        public ActionResult UpdateProject(ProjectModel.UpdateModel data, short? status = null)
+        {
+            try
+            {
+                //claim user to get actor
+                string actor = User.FindFirst(ClaimTypes.Actor)?.Value;
+
+                //claim user to get actor
+                var project = new ProjectModel();
+                project.readParamFromObj(data).setDb(_db).update(actor);
+
+                if (status.HasValue)
+                {
+                    project.param.projectStatus = status.Value;
+                }
+
+                return Ok(project.param);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+
+
     }
 }

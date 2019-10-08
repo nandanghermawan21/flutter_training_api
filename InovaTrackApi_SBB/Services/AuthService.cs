@@ -75,7 +75,9 @@ namespace InovaTrackApi_SBB.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Email, customer.CustomerId.ToString())
+                    new Claim(ClaimTypes.Email, customer.CustomerId.ToString()),
+                    new Claim(ClaimTypes.Actor, "C" /*code untuk source customer*/),
+                    new Claim(ClaimTypes.MobilePhone, customer.MobileNumber /*code untuk source customer*/),
                 }),
                 Expires = expiredTime,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -107,7 +109,9 @@ namespace InovaTrackApi_SBB.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Email, driver.DriverId.ToString())
+                    new Claim(ClaimTypes.Email, driver.DriverId.ToString()),
+                    new Claim(ClaimTypes.Actor, "S" /*code source untuk sales*/),
+                    new Claim(ClaimTypes.MobilePhone, driver.PhoneNumber),
                 }),
                 Expires = expiredTime,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

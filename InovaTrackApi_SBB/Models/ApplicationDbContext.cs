@@ -22,7 +22,8 @@ namespace InovaTrackApi_SBB.Models
         public DbSet<SAPProductMaterial> SAPProductMaterials { get; set; }
         public DbSet<SalesPayment> SalesPayments { get; set; }
         public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Project> Project { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectsStatus> ProjectStatuses { get; set; }
 
     }
 }
