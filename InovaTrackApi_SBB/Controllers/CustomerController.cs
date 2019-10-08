@@ -36,7 +36,7 @@ namespace InovaTrackApi_SBB.Controllers
             var customer = _customer.CheckPhoneExist(phoneNumber);
             if (customer == null)
                 return BadRequest(new
-                ResponeModel()
+                ResponseModel()
                 {
                     phoneNumber = phoneNumber,
                     statusString = $"{GlobalData.get.resource.phoneNumberNotRegistered}",
@@ -68,7 +68,7 @@ namespace InovaTrackApi_SBB.Controllers
                 if (a != null)
                 {
                     return Ok(new
-                    ResponeModel
+                    ResponseModel
                     {
                         phoneNumber = phoneNumber,
                         statusString = $"{GlobalData.get.resource.success}",
@@ -80,7 +80,7 @@ namespace InovaTrackApi_SBB.Controllers
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, (new
-                    ResponeModel
+                    ResponseModel
                     {
                         phoneNumber = phoneNumber,
                         statusString = $"{GlobalData.get.resource.smsFailedToSend}",
@@ -94,7 +94,7 @@ namespace InovaTrackApi_SBB.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponeModel
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel
                 {
                     phoneNumber = phoneNumber,
                     statusString = ex.Message,
@@ -114,7 +114,7 @@ namespace InovaTrackApi_SBB.Controllers
                 && m.IsDeleted != true);
 
             if (customer == null)
-                return BadRequest(new ResponeModel
+                return BadRequest(new ResponseModel
                 {
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,
@@ -130,7 +130,7 @@ namespace InovaTrackApi_SBB.Controllers
                 ModelState.AddModelError("message", $"{GlobalData.get.resource.confirmPaswordNotMatch}");
 
             if (!ModelState.IsValid)
-                return BadRequest(new ResponeModel
+                return BadRequest(new ResponseModel
                 {
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,
@@ -145,7 +145,7 @@ namespace InovaTrackApi_SBB.Controllers
                 customer.Password = psw;
                 await _db.SaveChangesAsync();
 
-                return Ok(new ResponeModel
+                return Ok(new ResponseModel
                 {
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,
@@ -156,7 +156,7 @@ namespace InovaTrackApi_SBB.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponeModel
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel
                 {
                     phoneNumber = customer.MobileNumber,
                     email = customer.Email,

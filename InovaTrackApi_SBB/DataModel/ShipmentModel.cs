@@ -39,9 +39,9 @@ namespace InovaTrackApi_SBB.DataModel
         /// <param name="shipmentNo"></param>
         /// <param name="driverId"></param>
         /// <returns></returns>
-        public ResponseModel get(string projectId = null, string shipmentNo = null, string driverId = null)
+        public Response get(string projectId = null, string shipmentNo = null, string driverId = null)
         {
-            return new ResponseModel();
+            return new Response();
         }
 
         /// <summary>
@@ -62,31 +62,31 @@ namespace InovaTrackApi_SBB.DataModel
         /// <param name="status"></param>
         /// <param name="photo">nanti terima base64 string immage</param>
         /// <returns></returns>
-        public ResponseModel emergency(EmergencyModel data)
+        public ResponseModel emergency(Emergency data)
         {
             return new ResponseModel();
         }
 
-        public ResponseModel pod(PodModel data)
+        public ResponseModel pod(Pod data)
         {
             return new ResponseModel();
         }
 
-        public class EmergencyModel
+        public class Emergency
         {
             public string photo { get; set; }
             public string message { get; set; }
         }
 
 
-        public class PodModel
+        public class Pod
         {
             public string photo { get; set; }
             public string ttd { get; set; }
             public string receipient { get; set; }
         }
 
-        public class ResponseModel
+        public class Response
         {
             public string projectId { get; set; }
             public string sapShipmentNo { get; set; }
