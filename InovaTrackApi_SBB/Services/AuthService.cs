@@ -95,35 +95,35 @@ namespace InovaTrackApi_SBB.Services
         public Driver AuthenticateDriver(string email, string password)
         {
             var hash = PasswordHasher.Hash(email, password);
-            var driver = db.Drivers.SingleOrDefault(x => x.Email == email && x.Password == hash);
+            //var driver = db.Drivers.SingleOrDefault(x => x.Email == email && x.Password == hash);
 
-            // return null if user not found
-            if (driver == null)
-                return null;
+            //// return null if user not found
+            //if (driver == null)
+            //    return null;
 
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var expiredTime = DateTime.UtcNow.AddDays(7);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Email, driver.DriverId.ToString()),
-                    new Claim(ClaimTypes.Actor, "S" /*code source untuk sales*/),
-                    new Claim(ClaimTypes.MobilePhone, driver.PhoneNumber),
-                }),
-                Expires = expiredTime,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            driver.Token = tokenHandler.WriteToken(token);
+            //// authentication successful so generate jwt token
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            //var expiredTime = DateTime.UtcNow.AddDays(7);
+            //var tokenDescriptor = new SecurityTokenDescriptor
+            //{
+            //    Subject = new ClaimsIdentity(new Claim[]
+            //    {
+            //        new Claim(ClaimTypes.Email, driver.DriverId.ToString()),
+            //        new Claim(ClaimTypes.Actor, "S" /*code source untuk sales*/),
+            //        new Claim(ClaimTypes.MobilePhone, driver.PhoneNumber),
+            //    }),
+            //    Expires = expiredTime,
+            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            //};
+            //var token = tokenHandler.CreateToken(tokenDescriptor);
+            //driver.Token = tokenHandler.WriteToken(token);
 
-            // remove password before returning
-            driver.Password = null;
-            driver.TokenExpiredTime = expiredTime.ToString("yyyy-MM-dd HH:mm:ss");
+            //// remove password before returning
+            //driver.Password = null;
+            //driver.TokenExpiredTime = expiredTime.ToString("yyyy-MM-dd HH:mm:ss");
 
-            return driver;
+            return new Driver();
         }
     }
 }

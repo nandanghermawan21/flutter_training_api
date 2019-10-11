@@ -8,33 +8,25 @@ namespace InovaTrackApi_SBB.Models
     public class Driver
     {
         [Key]
-        [Column("driver_id")]
-        public int DriverId { get; set; }
-        [Column("driver_name")]
-        public string DriverName { get; set; }
-        [Column("driver_code")]
-        public string DriverCode { get; set; }
-        [Column("sim_number")]
-        public string SimNumber { get; set; }
-        [Column("gsm_number")]
-        public string GSMNumber{ get; set; }
-        [Column("phone_number")]
-        public string PhoneNumber { get; set; }
-        [Column("status")]
-        public int? Status { get; set; }
-        [Column("password")]
-        public string Password { get; set; }
-        [Column("email")]
-        public string Email { get; set; }
-        [Column("reset_password_code")]
-        public string ResetPasswordCode { get; set; }
-        [Column("reset_password_expired_time")]
-        public DateTime? ResetPasswordExpiredTime { get; set; }
-        [Column("create_date")]
-        public DateTime? CreatedDate { get; set; }
-        [NotMapped]
-        public string Token { get; set; }
-        [NotMapped]
-        public string TokenExpiredTime { get; set; }
+        public int driver_id { get; set; }
+        public string driver_name { get; set; }
+        public string driver_code { get; set; }
+        public int? member_id { get; set; }
+        public string sim_number { get; set; }
+        public string gsm_number { get; set; }
+        public string phone_number { get; set; }
+        public bool phone_number_confirmed { get; set; }
+        public int? status { get; set; }
+        public DateTime? last_login_time { get; set; }
+        public string udid { get; set; }
+        public string registration_code { get; set; }
+        public string pin_hash { get; set; }
+        public string password { get; set; }
+        public string email { get; set; }
+        public string reset_password_code { get; set; }
+        public DateTime? reset_password_expired_time { get; set; }
+        public DateTime? created_date { get; set; }
+        public string driver_guid { get; set; }
+        public long update_seq { get; set; }
     }
 }

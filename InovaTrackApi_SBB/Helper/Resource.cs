@@ -27,6 +27,13 @@ namespace InovaTrackApi_SBB.Helper
             public string emailAlreadyRegistered = "Email already registered";
             public string registerSuccess = "Registration successful";
             public string productNotFound = "Product Material not found";
+            public string loading = "Loading";
+            public string leavingPlant = "Leaving Plant";
+            public string arriving = "Arriving";
+            public string unloading = "Unloading";
+            public string completed = "Completed";
+            public string waiting = "Waiting";
+
         }
         #endregion
 

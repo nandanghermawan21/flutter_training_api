@@ -58,20 +58,20 @@ namespace InovaTrackApi_SBB.Controllers
             return Ok(customer);
         }
 
-        [Route("driver-login")]
-        [HttpPost]
-        public ActionResult DriverLogin([FromBody]CustomerLoginModel request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //[Route("driver-login")]
+        //[HttpPost]
+        //public ActionResult DriverLogin([FromBody]CustomerLoginModel request)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var driver = authService.AuthenticateDriver(request.Email, request.Password);
+        //    var driver = authService.AuthenticateDriver(request.Email, request.Password);
 
-            if (driver == null)
-                return BadRequest(new { message = "Email or Password is incorrect" });
+        //    if (driver == null)
+        //        return BadRequest(new { message = "Email or Password is incorrect" });
 
-            driver.Password = null;
-            return Ok(driver);
-        }
+        //    driver.Password = null;
+        //    return Ok(driver);
+        //}
     }
 }

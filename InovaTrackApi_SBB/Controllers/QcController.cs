@@ -10,22 +10,22 @@ namespace InovaTrackApi_SBB.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class BatchingPlantController : ControllerBase
+    public class QcController : ControllerBase
     {
-        private BatchingPlantModel _bachingPlantModel;
+        private QcLabModel _qcLabModel;
 
-        public BatchingPlantController(ApplicationDbContext db)
+        public QcController(ApplicationDbContext db)
         {
-            _bachingPlantModel = new BatchingPlantModel(db);
+            _qcLabModel = new QcLabModel(db);
         }
 
-        [Route("get")]
+        [Route("lab")]
         [HttpGet]
-        public ActionResult BatchingPlants(int? bachingPlantId)
+        public ActionResult Lab(string labCode)
         {
             try
             {
-                var data = _bachingPlantModel.get(BatchingPlantId: bachingPlantId);
+                var data = _qcLabModel.get(labCode: labCode);
 
                 return Ok(data);
             }
@@ -35,13 +35,13 @@ namespace InovaTrackApi_SBB.Controllers
             }
         }
 
-        [Route("get/{lat}/{lon}")]
+        [Route("lab/{lat}/{lon}")]
         [HttpGet]
-        public ActionResult getNearest(double lat, double lon, int? count = null)
+        public ActionResult labNeares(double lat, double lon, int? count = null)
         {
             try
             {
-                var data = _bachingPlantModel.get(lat: lat, lon: lon, count: count);
+                var data = _qcLabModel.get(lat: lat, lon: lon, count: count);
 
                 return Ok(data);
             }

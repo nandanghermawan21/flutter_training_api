@@ -10,12 +10,20 @@ namespace InovaTrackApi_SBB.DataModel
 {
     public class ProductModel
     {
+
+        #region contructor
+
         private ApplicationDbContext _db;
         public ProductModel() { }
         public ProductModel(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
         }
+
+        #endregion
+
+        #region properties
+
         public int id { get; set; }
         public string quality { get; set; }
         public string description { get; set; }
@@ -23,7 +31,10 @@ namespace InovaTrackApi_SBB.DataModel
         public string imageUrl { get; set; }
         public string structureCode { get; set; }
         public string structureName { get; set; }
-        public  List<ProductModel> get(long? id = null, string structureCode = null, bool imageIncluded = false)
+
+        #endregion
+
+        public List<ProductModel> get(long? id = null, string structureCode = null, bool imageIncluded = false)
         {
             IQueryable<SAPProductMaterial> qData = _db.SAPProductMaterials;
 

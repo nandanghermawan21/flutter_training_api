@@ -95,7 +95,7 @@ namespace InovaTrackApi_SBB.Controllers
             }
         }
 
-        [Route("structure/{structureCode}")]
+        [Route("get/by-structure/{structureCode}")]
         [HttpGet]
         public ActionResult ProductByStructurType(string structureCode)
         {

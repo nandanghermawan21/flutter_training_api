@@ -24,6 +24,11 @@ namespace InovaTrackApi_SBB.Models
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectsStatus> ProjectStatuses { get; set; }
-
+        public DbSet<QcLab> QcLabs { get; set; }
+        public DbSet<ShipmentActivity> ShipmentActivities { get; set; }
+        public DbSet<ShipmentEmergency> ShipmentEmergencies { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<VehicleDriver> VehicleDrivers { get; set; }
+        public DbSet<Position> Positions { get; set; }
     }
 }

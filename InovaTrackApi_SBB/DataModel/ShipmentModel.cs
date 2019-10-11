@@ -32,78 +32,83 @@ namespace InovaTrackApi_SBB.DataModel
 
         #endregion
 
-        /// <summary>
-        /// ambil informasi shipment bisa berdasarkan projectId, shipment ataupun driver id
-        /// </summary>
-        /// <param name="projectId"></param>
-        /// <param name="shipmentNo"></param>
-        /// <param name="driverId"></param>
-        /// <returns></returns>
-        public Response get(string projectId = null, string shipmentNo = null, string driverId = null)
+        public List<Shipment> get(string shipmentId = null)
         {
-            return new Response();
+            IQueryable<Project> qProject = _db.Projects;
+
+            if (!string.IsNullOrEmpty(shipmentId)) qProject = qProject.Where(x => x.id == shipmentId);
+
+            var data = (from project in _db.Projects
+                        join shipment in _db.SAPShipments on project.sap_shipment_no equals shipment.shipment_no
+                        join shipmenactivity in _db.ShipmentActivities on shipment.LdtP_no equals shipmenactivity.ticket_number
+                        join vehicle in _db.Vehicles on shipmenactivity.truck_number equals vehicle.vehicle_number
+                        join vehicledriver in _db.VehicleDrivers on vehicle.vehicle_id equals vehicledriver.vehicle_id
+                        join diverData in _db.Drivers on vehicledriver.driver_id equals diverData.driver_id
+
+                        select new Shipment()
+                        {
+                            shipmentId = shipmenactivity.id,
+                            ticketNumber = shipmenactivity.ticket_number,
+                            volume = shipmenactivity.volume,
+                            vehicleNumber = shipmenactivity.truck_number,
+                            driverName = diverData.driver_name,
+                            statusId = shipmenactivity.statusId,
+                            status = shipmenactivity.status,
+                        }
+                        ).ToList();
+
+            return data;
         }
 
-        /// <summary>
-        /// catat konfirmsi status dari driver
-        /// </summary>
-        /// <param name="driverId"></param>
-        /// <param name="status"></param>
-        /// <returns></returns>
-        public ResponseModel confirm(string driverId, int status)
+        public class Shipment
         {
-            return new ResponseModel();
-        }
-
-        /// <summary>
-        /// catat laporan emergency dari driver
-        /// </summary>
-        /// <param name="driverId"></param>
-        /// <param name="status"></param>
-        /// <param name="photo">nanti terima base64 string immage</param>
-        /// <returns></returns>
-        public ResponseModel emergency(Emergency data)
-        {
-            return new ResponseModel();
-        }
-
-        public ResponseModel pod(Pod data)
-        {
-            return new ResponseModel();
-        }
-
-        public class Emergency
-        {
-            public string photo { get; set; }
-            public string message { get; set; }
-        }
-
-
-        public class Pod
-        {
-            public string photo { get; set; }
-            public string ttd { get; set; }
-            public string receipient { get; set; }
-        }
-
-        public class Response
-        {
-            public string projectId { get; set; }
-            public string sapShipmentNo { get; set; }
-            public string shipmentNo { get; set; } /* no do pengiriman*/
-            public string shipmentTimes { get; set; } /* pengiriman keberapa*/
-            public DateTime shipmentDate { get; set; }
-            public string vehicleNumber { get; set; }
-            public string driverId { get; set; } /* dihubungkan dengan user driver */
+            public int shipmentId { get; set; }
+            public string ticketNumber { get; set; }
             public string driverName { get; set; }
-            public double volume { get; set; } /* jumlah kubik yang dibawa di shipment */
-            public int status { get; set; } /* status loading, qc check, leaving plant, arriving, uloading, clompleted */
-            public string ststusString { get; set; } /* disertakan untuk cross chek */
-            public double lat { get; set; } /* posisi kendaraan saat ini */
-            public double lon { get; set; }
-            public string qcFile { get; set; } /*file string base64 hasil qc */
-
-            /* mungkin kedepannya responnya akan disertakan juga tanggal pod nya dan jam setiap driver melakukan konfirmasi status */
+            public string vehicleNumber { get; set; }
+            public int? volume { get; set; }
+            public int statusId { get; set; }
+            public string status { get; set; }
+            public string qcFile { get; set; }
         }
+
+        public class ShipmentStatus : Shipment
+        {
+            public DateTime? beginLoadingTime { get; set; }
+            public DateTime? leavePlantTime { get; set; }
+            public DateTime? arrivalTime { get; set; }
+            public DateTime? beginUnloadingTime { get; set; }
+            public DateTime? unloadingByDriver { get; set; }
+            public String podRecipientName { get; set; }
+            public DateTime? podTime { get; set; }
+            public string podFile1 { get; set; }
+            public string podFile2 { get; set; }
+            public DateTime? returningTime { get; set; }
+            public DateTime? availableTime { get; set; }
+            public bool isEmergency { get; set; }
+        }
+
+        public class Vehicle
+        {
+            public int deliveryId { get; set; }
+            public string driverName { get; set; }
+        }
+
+        public class LivePosition : Vehicle
+        {
+            public List<LatLng> history { get; set; }
+        }
+
+        public class Position : Vehicle
+        {
+            public LatLng position { get; set; }
+        }
+
+        public class LatLng
+        {
+            public double lat { get; set; }
+            public double lon { get; set; }
+        }
+
     }
 }

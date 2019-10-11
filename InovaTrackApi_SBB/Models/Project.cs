@@ -24,6 +24,7 @@ namespace InovaTrackApi_SBB.Models
         public long? product_material_id { get; set; }
         public string slump_code { get; set; }
         public decimal? volume { get; set; }
+        public string lab_code { get; set; }
         public decimal? price { get; set; }
         public DateTime? shipment_date { get; set; }
         public int? shipment_interval { get; set; }

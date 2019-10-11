@@ -23,53 +23,53 @@ namespace InovaTrackApi_SBB.Controllers
             _shipmentModel = new ShipmentModel(db, config);
         }
 
-        [Route("get")]
-        [HttpGet]
-        public ActionResult Shipment(string projectId = null, string shipmentNo = null, string driverId = null)
-        {
-            return (Ok(new ShipmentModel.Response()));
-        }
+        //    [Route("get")]
+        //    [HttpGet]
+        //    public ActionResult Shipment(string projectId = null, string shipmentNo = null, string driverId = null)
+        //    {
+        //        return (Ok(new ShipmentModel.Response()));
+        //    }
 
-        [Route("confirm")]
-        [HttpGet]
-        public ActionResult Confirm(String shipmentId)
-        {
-            //hanya driver yang boleh lakukan confirm jika yang lain masuk sini return badrequest authentication error
-            return (Ok(new ResponseModel()
-            {
-                statusCode = 0,
-                statusString = "status",
-                data = { } /* untuk saat ini boleh dikosongkan */
-            }));
-        }
-
-
-        [Route("emergency")]
-        [HttpGet]
-        public ActionResult Emergency(ShipmentModel.Emergency data)
-        {
-            //hanya driver yang boleh lakukan  jika yang lain masuk sini return badrequest authentication error
-            return (Ok(new ResponseModel()
-            {
-                statusCode = 0,
-                statusString = "status",
-                data = { } /* untuk saat ini boleh dikosongkan */
-            }));
-        }
+        //    [Route("confirm")]
+        //    [HttpGet]
+        //    public ActionResult Confirm(String shipmentId)
+        //    {
+        //        //hanya driver yang boleh lakukan confirm jika yang lain masuk sini return badrequest authentication error
+        //        return (Ok(new ResponseModel()
+        //        {
+        //            statusCode = 0,
+        //            statusString = "status",
+        //            data = { } /* untuk saat ini boleh dikosongkan */
+        //        }));
+        //    }
 
 
-        [Route("pod")]
-        [HttpGet]
-        public ActionResult Pod(ShipmentModel.Pod data)
-        {
-            //hanya driver yang boleh lakukan  jika yang lain masuk sini return badrequest authentication error
-            return (Ok(new ResponseModel()
-            {
-                statusCode = 0,
-                statusString = "status",
-                data = { } /* untuk saat ini boleh dikosongkan */
-            }));
-        }
+        //    [Route("emergency")]
+        //    [HttpGet]
+        //    public ActionResult Emergency(ShipmentModel.Emergency data)
+        //    {
+        //        //hanya driver yang boleh lakukan  jika yang lain masuk sini return badrequest authentication error
+        //        return (Ok(new ResponseModel()
+        //        {
+        //            statusCode = 0,
+        //            statusString = "status",
+        //            data = { } /* untuk saat ini boleh dikosongkan */
+        //        }));
+        //    }
+
+
+        //    [Route("pod")]
+        //    [HttpGet]
+        //    public ActionResult Pod(ShipmentModel.Pod data)
+        //    {
+        //        //hanya driver yang boleh lakukan  jika yang lain masuk sini return badrequest authentication error
+        //        return (Ok(new ResponseModel()
+        //        {
+        //            statusCode = 0,
+        //            statusString = "status",
+        //            data = { } /* untuk saat ini boleh dikosongkan */
+        //        }));
+        //    }
 
     }
 }

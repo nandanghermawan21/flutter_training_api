@@ -58,8 +58,9 @@ namespace InovaTrackApi_SBB.DataModel
                         join structure in _db.ProductStructureType on product.StructureCode equals structure.StructureCode
                         join grade in _db.ProductGrades on product.GradeCode equals grade.GradeCode
                         join projectstatus in _db.ProjectStatuses on project.status_id equals projectstatus.id_status
-                        let shipmentCount = _db.SAPShipments.Count(x => x.ShipmentNumber == project.sap_shipment_no)
-                        let totalshipment = _db.SAPShipments.FirstOrDefault(x => x.ShipmentNumber == project.sap_shipment_no).ShipmentInterval
+                        let qclab = _db.QcLabs.FirstOrDefault(x => project.lab_code == x.lab_code)
+                        let shipmentCount = _db.SAPShipments.Count(x => x.shipment_no == project.sap_shipment_no)
+                        let totalshipment = _db.SAPShipments.FirstOrDefault(x => x.shipment_no == project.sap_shipment_no).shipment_interval
                         select new ResponseModel()
                         {
                             id = project.id,
@@ -84,6 +85,8 @@ namespace InovaTrackApi_SBB.DataModel
                             slumpCode = slump.SlumpCode,
                             slumpName = slump.SlumpName,
                             volume = project.volume,
+                            labCode = project.lab_code,
+                            LabName = qclab.lab_name,
                             price = project.price,
                             shipmentDate = project.shipment_date,
                             shipmentInterval = project.shipment_interval,
@@ -118,6 +121,7 @@ namespace InovaTrackApi_SBB.DataModel
                 product_material_id = param.productId,
                 slump_code = param.slumpCode,
                 volume = param.volume,
+                lab_code = param.labCode,
                 price = param.price,
                 shipment_date = param.shipmentDate,
                 shipment_interval = param.shipmentInterval,
@@ -151,6 +155,7 @@ namespace InovaTrackApi_SBB.DataModel
                 project.product_material_id = param.productId;
                 project.slump_code = param.slumpCode;
                 project.volume = param.volume;
+                project.lab_code = param.labCode;
                 project.price = param.price;
                 project.shipment_date = param.shipmentDate;
                 project.shipment_interval = param.shipmentInterval;
@@ -195,6 +200,7 @@ namespace InovaTrackApi_SBB.DataModel
             public int? batchingPlantId { get; set; }
             public long productId { get; set; }
             public string slumpCode { get; set; }
+            public string labCode { get; set; }
             public decimal? volume { get; set; }
             public decimal? price { get; set; }
             public DateTime? shipmentDate { get; set; }
@@ -219,6 +225,7 @@ namespace InovaTrackApi_SBB.DataModel
             public string gradeCode { get; set; }
             public string gradeName { get; set; }
             public string slumpName { get; set; }
+            public string LabName { get; set; }
             public int shipmentCount { get; set; }
             public short? totalShipmet { get; set; }
             public short projectStatus { get; set; }
