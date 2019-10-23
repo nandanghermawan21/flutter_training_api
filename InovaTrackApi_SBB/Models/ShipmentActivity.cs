@@ -31,7 +31,7 @@ namespace InovaTrackApi_SBB.Models
         public string pod_file2 { get; set; }
         public DateTime? returning_time { get; set; }
         public DateTime? available_time { get; set; }
-        public bool is_emergency { get; set; }
+        public bool? is_emergency { get; set; }
         public string created_by { get; set; }
         public DateTime? created_date { get; set; }
         public string modified_by { get; set; }
@@ -41,44 +41,48 @@ namespace InovaTrackApi_SBB.Models
         public int statusId { get; set; }
 
         [NotMapped]
-        public string status
+        public string status { get; set; }
+
+        public ShipmentActivity readStatus()
         {
-            get
+            status = GlobalData.get.resource.waiting;
+            statusId = 0;
+            if (begin_loading_time.HasValue)
             {
-                string sts = GlobalData.get.resource.waiting;
-                statusId = 0;
-                if (begin_loading_time.HasValue)
-                {
-                    sts = GlobalData.get.resource.loading;
-                    statusId = 1;
-                }
-                if (leave_plant_time.HasValue)
-                {
-                    sts = GlobalData.get.resource.leavingPlant;
-                    statusId = 2;
-                }
-                if (arrival_time.HasValue)
-                {
-                    sts = GlobalData.get.resource.arriving;
-                    statusId = 3;
-                }
-                if (begin_unloading_time.HasValue)
-                {
-                    sts = GlobalData.get.resource.unloading;
-                    statusId = 4;
-                }
-                if (unloading_by_driver.HasValue)
-                {
-                    sts = GlobalData.get.resource.unloading;
-                    statusId = 5;
-                }
-                if (returning_time.HasValue)
-                {
-                    sts = GlobalData.get.resource.completed;
-                    statusId = 6;
-                }
-                return sts;
+                status = GlobalData.get.resource.loading;
+                statusId = 1;
             }
+            if (leave_plant_time.HasValue)
+            {
+                status = GlobalData.get.resource.leavingPlant;
+                statusId = 2;
+            }
+            if (arrival_time.HasValue)
+            {
+                status = GlobalData.get.resource.arriving;
+                statusId = 3;
+            }
+            if (begin_unloading_time.HasValue)
+            {
+                status = GlobalData.get.resource.unloading;
+                statusId = 4;
+            }
+            if (unloading_by_driver.HasValue)
+            {
+                status = GlobalData.get.resource.unloading;
+                statusId = 5;
+            }
+            if (returning_time.HasValue)
+            {
+                status = GlobalData.get.resource.returnning;
+                statusId = 6;
+            }
+            if (available_time.HasValue)
+            {
+                status = GlobalData.get.resource.completed;
+                statusId = 7;
+            }
+            return this;
         }
     }
 

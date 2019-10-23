@@ -26,6 +26,7 @@ namespace InovaTrackApi_SBB.DataModel
 
         public int id { get; set; }
         public string quality { get; set; }
+        public string qualityName { get; set; }
         public string description { get; set; }
         public decimal price { get; set; }
         public string imageUrl { get; set; }
@@ -44,6 +45,7 @@ namespace InovaTrackApi_SBB.DataModel
 
             var data = (from a in qData
                         join b in _db.ProductStructureType on a.StructureCode equals b.StructureCode
+                        join c in _db.ProductGrades on a.GradeCode equals c.GradeCode
                         let img = imageIncluded ? _db.ProductImages.FirstOrDefault((x) => x.productId == a.MaterialId) : null
                         select new ProductModel
                         {
@@ -51,6 +53,7 @@ namespace InovaTrackApi_SBB.DataModel
                             description = a.Description,
                             price = a.Price,
                             quality = a.GradeCode,
+                            qualityName = c.GradeName,
                             structureCode = a.StructureCode,
                             structureName = b.StructureName,
                             imageUrl = img != null ? img.imageSrc : string.Empty

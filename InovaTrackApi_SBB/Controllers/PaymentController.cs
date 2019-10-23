@@ -1,6 +1,8 @@
-﻿using InovaTrackApi_SBB.Helper;
+﻿using InovaTrackApi_SBB.DataModel;
+using InovaTrackApi_SBB.Helper;
 using InovaTrackApi_SBB.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -16,39 +18,59 @@ namespace InovaTrackApi_SBB.Controllers
     public class PaymentController : ControllerBase
     {
         private ApplicationDbContext _db;
-        private readonly AppSettings _config;
+        private PaymentModel _paymentModel;
 
         public PaymentController(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
-            _config = config.Value;
+            _paymentModel = new PaymentModel(db, config);
         }
 
-        [Route("get-all")]
+
+        [Route("get")]
         [HttpGet]
-        public ActionResult Payments()
+        public ActionResult get(string projectId, int? paymentId = null, bool? includeImmage = null)
         {
-            var data = _db.SalesPayments.OrderByDescending(m => m.PaymentDate).ToList();
-            return Ok(data);
+            try
+            {
+                var data = _paymentModel.get(projectId: projectId, includeImmage: includeImmage ?? false, paymentId: paymentId);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
-        [Route("get/{id}")]
+        [Route("account")]
         [HttpGet]
-        public ActionResult Payments(int id)
+        public ActionResult account(string accountId = "")
         {
-            var data = _db.SalesPayments.FirstOrDefault(m => m.PaymentId == id);
-            if (data == null)
-                return BadRequest(new { message = "Payment not found" });
-            return Ok(data);
+            try
+            {
+                var data = _paymentModel.GetBankAccounts(accoundId: accountId);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
-        [Route("get-by-shipment/{shipmentNumber}")]
-        [HttpGet]
-        public ActionResult Payments(string shipmentNumber)
+        [Route("create")]
+        [HttpPost]
+        public ActionResult create(PaymentModel.PaymentParam data)
         {
-            var data = _db.SalesPayments.Where(m => m.ShipmentNumber == shipmentNumber)
-                .OrderByDescending(m => m.PaymentDate).ToList();
-            return Ok(data);
+            try
+            {
+                var payment = _paymentModel.create(data);
+                return Ok(payment);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
+
     }
 }

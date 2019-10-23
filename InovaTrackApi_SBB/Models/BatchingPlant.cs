@@ -13,6 +13,8 @@ namespace InovaTrackApi_SBB.Models
         public int MemberId { get; set; }
         [Column("batching_plant_name")]
         public string BatchingPlantName { get; set; }
+        [Column("batching_plant_code")]
+        public string BatchingPlantCode { get; set; }
         [Column("lon")]
         public double? Lon { get; set; }
         [Column("lat")]

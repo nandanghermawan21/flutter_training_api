@@ -16,10 +16,11 @@ namespace InovaTrackApi_SBB
         public string lab_name { get; set; }
         public string lab_address { get; set; }
         public string lab_contact { get; set; }
+        public decimal? qc_price { get; set; }
         public string contact_email { get; set; }
         public string contact_phone { get; set; }
-        public double longitude { get; set; }
-        public double latitude { get; set; }
+        public double? longitude { get; set; }
+        public double? latitude { get; set; }
         public string remarks { get; set; }
         public string created_by { get; set; }
         public DateTime created_date { get; set; }

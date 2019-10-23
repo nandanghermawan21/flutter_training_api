@@ -1,4 +1,5 @@
-﻿using InovaTrackApi_SBB.Helper;
+﻿using InovaTrackApi_SBB.DataModel;
+using InovaTrackApi_SBB.Helper;
 using InovaTrackApi_SBB.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,7 @@ namespace InovaTrackApi_SBB.Services
     {
         User Authenticate(string username, string password);
         Customer AuthenticateCustomer(string email, string password);
+        Sales AuthenticateSales(string email, string password);
         Driver AuthenticateDriver(string email, string password);
     }
 
@@ -58,14 +60,27 @@ namespace InovaTrackApi_SBB.Services
             return user;
         }
 
-        public Customer AuthenticateCustomer(string email, string password)
+        public Customer AuthenticateCustomer(string userId, string password)
         {
-            var hash = PasswordHasher.Hash(email, password);
-            var customer = db.Customers.SingleOrDefault(x => x.Email == email && x.Password == hash && x.IsDeleted != true);
+            var hash = PasswordHasher.Hash(userId, password);
+
+            var customer = db.Customers.SingleOrDefault(x => x.Email == userId && x.Password == hash && x.IsDeleted != true);
+
+            
 
             // return null if user not found
             if (customer == null)
-                return null;
+            {
+                //check with no telpon
+                customer = new CustomerModel(db).CheckPhoneExist(userId);
+
+                if (customer == null)
+                    return null;
+
+                if (customer.Password != hash)
+                    return null;
+
+            }
 
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -75,7 +90,7 @@ namespace InovaTrackApi_SBB.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Email, customer.CustomerId.ToString()),
+                    new Claim(ClaimTypes.Sid, customer.CustomerId.ToString()),
                     new Claim(ClaimTypes.Actor, "C" /*code untuk source customer*/),
                     new Claim(ClaimTypes.MobilePhone, customer.MobileNumber /*code untuk source customer*/),
                 }),
@@ -87,43 +102,77 @@ namespace InovaTrackApi_SBB.Services
 
             // remove password before returning
             customer.Password = null;
-            customer.TokenExpiredTime = expiredTime.ToString("yyyy-MM-dd HH:mm:ss");
+            customer.TokenExpiredTime = expiredTime;
 
             return customer;
+        }
+
+        public Sales AuthenticateSales(string email, string password)
+        {
+            var hash = PasswordHasher.Hash(email, password);
+            var sales = db.Saleses.SingleOrDefault(x => x.email == email && x.password == hash && x.isdeleted != true);
+
+            // return null if user not found
+            if (sales == null)
+                return null;
+
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var expiredTime = DateTime.UtcNow.AddDays(7);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Sid, sales.salesId.ToString()),
+                    new Claim(ClaimTypes.Actor, "S" /*code untuk source sales*/),
+                    new Claim(ClaimTypes.MobilePhone, sales.phone /*code untuk source customer*/),
+                }),
+                Expires = expiredTime,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            sales.Token = tokenHandler.WriteToken(token);
+
+            // remove password before returning
+            sales.password = null;
+            sales.TokenExpiredTime = expiredTime;
+
+            return sales;
         }
 
         public Driver AuthenticateDriver(string email, string password)
         {
             var hash = PasswordHasher.Hash(email, password);
-            //var driver = db.Drivers.SingleOrDefault(x => x.Email == email && x.Password == hash);
+            var driver = db.Drivers.FirstOrDefault(x => x.email == email && x.password == hash);
 
-            //// return null if user not found
-            //if (driver == null)
-            //    return null;
+            // return null if user not found
+            if (driver == null)
+                return null;
 
-            //// authentication successful so generate jwt token
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            //var expiredTime = DateTime.UtcNow.AddDays(7);
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new Claim[]
-            //    {
-            //        new Claim(ClaimTypes.Email, driver.DriverId.ToString()),
-            //        new Claim(ClaimTypes.Actor, "S" /*code source untuk sales*/),
-            //        new Claim(ClaimTypes.MobilePhone, driver.PhoneNumber),
-            //    }),
-            //    Expires = expiredTime,
-            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            //};
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-            //driver.Token = tokenHandler.WriteToken(token);
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var expiredTime = DateTime.UtcNow.AddDays(7);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Sid, driver.driverId.ToString()),
+                    new Claim(ClaimTypes.Actor, "D" /*code source untuk driver*/),
+                    new Claim(ClaimTypes.MobilePhone, driver.phoneNumber ?? ""),
+                }),
+                Expires = expiredTime,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            driver.Token = tokenHandler.WriteToken(token);
 
-            //// remove password before returning
-            //driver.Password = null;
-            //driver.TokenExpiredTime = expiredTime.ToString("yyyy-MM-dd HH:mm:ss");
+            // remove password before returning
+            driver.password = null;
+            driver.TokenExpiredTime = expiredTime;
 
-            return new Driver();
+            return driver;
         }
     }
 }

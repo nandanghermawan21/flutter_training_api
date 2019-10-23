@@ -8,6 +8,8 @@ using InovaTrackApi_SBB.DataModel;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static InovaTrackApi_SBB.DataModel.AuthModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InovaTrackApi_SBB.Controllers
 {
@@ -25,7 +27,7 @@ namespace InovaTrackApi_SBB.Controllers
 
             _db = db;
             _config = config.Value;
-            _customer = new CustomerModel(db, config);
+            _customer = new CustomerModel(db);
         }
 
         [Route("forgot-password")]
@@ -35,15 +37,7 @@ namespace InovaTrackApi_SBB.Controllers
 
             var customer = _customer.CheckPhoneExist(phoneNumber);
             if (customer == null)
-                return BadRequest(new
-                ResponseModel()
-                {
-                    phoneNumber = phoneNumber,
-                    statusString = $"{GlobalData.get.resource.phoneNumberNotRegistered}",
-                    email = "",
-                    statusCode = 0,
-                    data = { }
-                });
+                return BadRequest($"{GlobalData.get.resource.phoneNumberNotRegistered}");
             try
             {
                 var totalMinutes = _config.ResetPasswordExpiredTime;
@@ -68,40 +62,21 @@ namespace InovaTrackApi_SBB.Controllers
                 if (a != null)
                 {
                     return Ok(new
-                    ResponseModel
                     {
-                        phoneNumber = phoneNumber,
-                        statusString = $"{GlobalData.get.resource.success}",
-                        statusCode = 1,
-                        data = { },
-                        email = customer.Email
+                        email = customer.Email,
+                        code = code,
                     });
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, (new
-                    ResponseModel
-                    {
-                        phoneNumber = phoneNumber,
-                        statusString = $"{GlobalData.get.resource.smsFailedToSend}",
-                        statusCode = 0,
-                        data = { },
-                        email = customer.Email
-                    }));
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"{GlobalData.get.resource.smsFailedToSend}");
 
                 }
 
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel
-                {
-                    phoneNumber = phoneNumber,
-                    statusString = ex.Message,
-                    statusCode = 0,
-                    data = { },
-                    email = customer.Email
-                });
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -114,30 +89,16 @@ namespace InovaTrackApi_SBB.Controllers
                 && m.IsDeleted != true);
 
             if (customer == null)
-                return BadRequest(new ResponseModel
-                {
-                    phoneNumber = customer.MobileNumber,
-                    email = customer.Email,
-                    statusCode = 0,
-                    statusString = ""
-
-                });
+                return BadRequest($"{GlobalData.get.resource.customerNotFound}");
 
             if (data.NewPassword.Length < 8)
-                ModelState.AddModelError("message", $"{GlobalData.get.resource.newPasswordMustBeAtLeast8CharacterLong}");
+                ModelState.AddModelError("Password", $"{GlobalData.get.resource.newPasswordMustBeAtLeast8CharacterLong}");
 
             else if (data.NewPassword != data.ConfirmPassword)
-                ModelState.AddModelError("message", $"{GlobalData.get.resource.confirmPaswordNotMatch}");
+                ModelState.AddModelError("Confirm Password", $"{GlobalData.get.resource.confirmPaswordNotMatch}");
 
             if (!ModelState.IsValid)
-                return BadRequest(new ResponseModel
-                {
-                    phoneNumber = customer.MobileNumber,
-                    email = customer.Email,
-                    statusCode = 0,
-                    statusString = $"{GlobalData.get.resource.invalidData}",
-                    data = ModelState,
-                });
+                return BadRequest(ModelState);
 
             try
             {
@@ -145,25 +106,14 @@ namespace InovaTrackApi_SBB.Controllers
                 customer.Password = psw;
                 await _db.SaveChangesAsync();
 
-                return Ok(new ResponseModel
+                return Ok(new
                 {
-                    phoneNumber = customer.MobileNumber,
-                    email = customer.Email,
-                    statusCode = 1,
-                    statusString = $"{GlobalData.get.resource.passwordDuccessfullyChanged}",
-                    data = { },
+                    email = customer.Email
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel
-                {
-                    phoneNumber = customer.MobileNumber,
-                    email = customer.Email,
-                    statusCode = 0,
-                    statusString = ex.Message,
-                    data = { },
-                });
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -209,6 +159,51 @@ namespace InovaTrackApi_SBB.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [Route("update-profile/{id}")]
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> CustomerUpdateProfile(int id, ProfileModel profile)
+        {
+            try
+            {
+                Customer customer = new Customer
+                {
+                    CustomerId = id,
+                    Email = profile.email,
+                    CustomerName = profile.name,
+                    Address1 = profile.addrss,
+                    customerAvatar = profile.avatar,
+                };
+
+                customer = _customer.update(customer);
+
+                if (customer == null)
+                    return BadRequest(GlobalData.get.resource.customerNotFound);
+
+                return Ok(customer);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+
+        [Route("get")]
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> Get(int? id, string salesId = null)
+        {
+            try
+            {
+                var data = _customer.get(userId: id, salesId: salesId);
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
 

@@ -37,7 +37,7 @@ namespace InovaTrackApi_SBB.Controllers
 
         [Route("lab/{lat}/{lon}")]
         [HttpGet]
-        public ActionResult labNeares(double lat, double lon, int? count = null)
+        public ActionResult labNeares(double? lat = null, double? lon = null, int? count = null)
         {
             try
             {

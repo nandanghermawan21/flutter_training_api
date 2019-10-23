@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using static InovaTrackApi_SBB.DataModel.AuthModel;
 
 namespace InovaTrackApi_SBB.Controllers
 {
@@ -37,17 +38,17 @@ namespace InovaTrackApi_SBB.Controllers
             try
             {
                 //claim user to get actor
-                var source = User.FindFirst(ClaimTypes.Actor)?.Value;
+                var aktor = User.FindFirst(ClaimTypes.Actor)?.Value;
                 string salesid = null;
 
-                switch (source)
+                switch (aktor)
                 {
-                    case Projectsource.customer:
-                        customerid = int.Parse(User.FindFirst(ClaimTypes.Email)?.Value);
+                    case Actor.customer:
+                        customerid = int.Parse(User.FindFirst(ClaimTypes.Sid)?.Value);
                         break;
 
-                    case Projectsource.sales:
-                        salesid = User.FindFirst(ClaimTypes.Email)?.Value;
+                    case Actor.sales:
+                        salesid = User.FindFirst(ClaimTypes.Sid)?.Value;
                         break;
                 }
 
@@ -74,14 +75,17 @@ namespace InovaTrackApi_SBB.Controllers
                 project.param.source = User.FindFirst(ClaimTypes.Actor)?.Value;
                 switch (project.param.source)
                 {
-                    case Projectsource.customer:
-                        project.param.customerId = int.Parse(User.FindFirst(ClaimTypes.Email)?.Value);
+                    case Actor.customer:
+                        project.param.customerId = int.Parse(User.FindFirst(ClaimTypes.Sid)?.Value);
                         break;
 
-                    case Projectsource.sales:
-                        project.param.salesId = User.FindFirst(ClaimTypes.Email)?.Value;
+                    case Actor.sales:
+                        project.param.salesId = User.FindFirst(ClaimTypes.Sid)?.Value;
                         project.param.customerId = customerId;
                         break;
+
+                    default:
+                        return BadRequest(GlobalData.get.resource.thisUserIsNotPermitted);
                 }
 
                 if (status.HasValue)
@@ -108,14 +112,32 @@ namespace InovaTrackApi_SBB.Controllers
                 //claim user to get actor
                 string actor = User.FindFirst(ClaimTypes.Actor)?.Value;
 
+                switch (actor)
+                {
+                    case Actor.customer:
+
+                        break;
+
+                    case Actor.sales:
+
+                        break;
+
+                    default:
+                        return BadRequest(GlobalData.get.resource.thisUserIsNotPermitted);
+                }
+
+
                 //claim user to get actor
                 var project = new ProjectModel();
-                project.readParamFromObj(data).setDb(_db).update(actor);
+                project.readParamFromObj(data);
+
 
                 if (status.HasValue)
                 {
                     project.param.projectStatus = status.Value;
                 }
+
+                project.setDb(_db).update(actor);
 
                 return Ok(project.param);
             }

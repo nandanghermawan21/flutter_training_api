@@ -26,6 +26,7 @@ namespace InovaTrackApi_SBB.Models
         public decimal? volume { get; set; }
         public string lab_code { get; set; }
         public decimal? price { get; set; }
+        public decimal? final_price { get; set; }
         public DateTime? shipment_date { get; set; }
         public int? shipment_interval { get; set; }
         public short status_id { get; set; }
@@ -61,11 +62,6 @@ namespace InovaTrackApi_SBB.Models
 
     }
 
-    public static class Projectsource
-    {
-        public const string customer = "C";
-        public const string sales = "";
-    }
 
     public static class ProjectStatus
     {

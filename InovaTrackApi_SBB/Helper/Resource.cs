@@ -31,9 +31,11 @@ namespace InovaTrackApi_SBB.Helper
             public string leavingPlant = "Leaving Plant";
             public string arriving = "Arriving";
             public string unloading = "Unloading";
+            public string returnning = "Returning";
             public string completed = "Completed";
             public string waiting = "Waiting";
-
+            public string emailOrPasswordInCorrect = "email or password incorrect";
+            public string thisUserIsNotPermitted = "This user is not permitted";
         }
         #endregion
 
@@ -86,6 +88,15 @@ namespace InovaTrackApi_SBB.Helper
                     emailAlreadyRegistered = "Email telah terdaftar",
                     registerSuccess = "Registrasi berhasil",
                     productNotFound = "Product tidak ditemukan",
+                    emailOrPasswordInCorrect = "email atau kata sandi salah",
+                    waiting = "menunggu",
+                    loading = "Memuat",
+                    arriving = "Tiba di Lokasi",
+                    unloading = "Membongkar",
+                    leavingPlant = "Meninggalkan Plant",
+                    returnning = "Kembali ke Plant",
+                    completed = "Complete",
+                    thisUserIsNotPermitted = "User ini tidak diizinkan",
                 };
             }
         }

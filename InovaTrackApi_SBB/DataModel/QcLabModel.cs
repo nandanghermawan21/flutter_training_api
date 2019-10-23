@@ -28,6 +28,7 @@ namespace InovaTrackApi_SBB.DataModel
         public string labName { get; set; }
         public string labAddress { get; set; }
         public string labContact { get; set; }
+        public decimal? qcPrice { get; set; }
         public string labContactEmail { get; set; }
         public string LabContactPhone { get; set; }
         public double? labLon { get; set; }
@@ -57,6 +58,7 @@ namespace InovaTrackApi_SBB.DataModel
                             labContactEmail = qcLab.contact_email,
                             LabContactPhone = qcLab.contact_phone,
                             labAddress = qcLab.lab_address,
+                            qcPrice = qcLab.qc_price,
                             labLat = qcLab.latitude,
                             labLon = qcLab.longitude,
                             labType = qcLab.lab_type,

@@ -51,6 +51,7 @@ namespace InovaTrackApi_SBB.DataModel
             if (!string.IsNullOrEmpty(id)) qData = qData.Where(x => x.id == id);
 
             var data = (from project in qData
+                        join customer in _db.Customers on project.customer_id equals (int)customer.CustomerId
                         join product in _db.SAPProductMaterials on project.product_material_id equals product.MaterialId
                         join timeslots in _db.SAPTimeSlots on project.time_slot_id equals timeslots.SlotId
                         join slump in _db.ProductSlumps on project.slump_code equals slump.SlumpCode
@@ -60,7 +61,9 @@ namespace InovaTrackApi_SBB.DataModel
                         join projectstatus in _db.ProjectStatuses on project.status_id equals projectstatus.id_status
                         let qclab = _db.QcLabs.FirstOrDefault(x => project.lab_code == x.lab_code)
                         let shipmentCount = _db.SAPShipments.Count(x => x.shipment_no == project.sap_shipment_no)
+                        let volumeCount = _db.SAPShipments.Where(x => x.shipment_no == project.sap_shipment_no).Sum(x => x.kirim_quantity)
                         let totalshipment = _db.SAPShipments.FirstOrDefault(x => x.shipment_no == project.sap_shipment_no).shipment_interval
+                        let paidOf = _db.peojectPayments.Where(x => x.project_id == project.id && x.status == 1).Sum(x => x.paid_amount)
                         select new ResponseModel()
                         {
                             id = project.id,
@@ -85,9 +88,14 @@ namespace InovaTrackApi_SBB.DataModel
                             slumpCode = slump.SlumpCode,
                             slumpName = slump.SlumpName,
                             volume = project.volume,
+                            volumeCount = volumeCount ?? 0,
                             labCode = project.lab_code,
-                            LabName = qclab.lab_name,
+                            labName = qclab.lab_name,
+                            labAddress = qclab.lab_address,
+                            qcPrice = qclab.qc_price,
                             price = project.price,
+                            paidOff = paidOf,
+                            finalPrice = project.final_price,
                             shipmentDate = project.shipment_date,
                             shipmentInterval = project.shipment_interval,
                             shipmentCount = shipmentCount,
@@ -97,6 +105,8 @@ namespace InovaTrackApi_SBB.DataModel
                             dateTime = project.created_date,
                             source = project.source,
                             customerId = project.customer_id,
+                            customerName = customer.CustomerName,
+                            customerAvatar = customer.customerAvatar,
                             salesId = project.sales_id,
                         }).ToList();
 
@@ -123,9 +133,10 @@ namespace InovaTrackApi_SBB.DataModel
                 volume = param.volume,
                 lab_code = param.labCode,
                 price = param.price,
+                final_price = param.finalPrice,
                 shipment_date = param.shipmentDate,
                 shipment_interval = param.shipmentInterval,
-                status_id = param.projectStatus,
+                status_id = param.projectStatus.Value,
                 source = param.source,
                 customer_id = param.customerId,
                 sales_id = param.salesId,
@@ -143,26 +154,28 @@ namespace InovaTrackApi_SBB.DataModel
 
             if (project != null)
             {
-                project.sap_shipment_no = param.shipmentNo;
-                project.project_name = param.name;
-                project.shipto_name = param.shiptoName;
-                project.shipto_address = param.shiptoAdrress;
-                project.ismixerallowed = param.isMixerAllowed;
-                project.lat = param.lat;
-                project.lon = param.lon;
-                project.time_slot_id = param.timeSlotId;
-                project.batching_plant_id = param.batchingPlantId;
-                project.product_material_id = param.productId;
-                project.slump_code = param.slumpCode;
-                project.volume = param.volume;
-                project.lab_code = param.labCode;
-                project.price = param.price;
-                project.shipment_date = param.shipmentDate;
-                project.shipment_interval = param.shipmentInterval;
-                project.status_id = param.projectStatus;
-                project.customer_id = param.customerId;
-                project.sales_id = param.salesId;
-                project.updated_by = param.source;
+                if (param.shipmentNo != null) project.sap_shipment_no = param.shipmentNo;
+                if (param.name != null) project.project_name = param.name;
+                if (param.shiptoName != null) project.shipto_name = param.shiptoName;
+                if (param.shiptoAdrress != null) project.shipto_address = param.shiptoAdrress;
+                if (param.isMixerAllowed != null) project.ismixerallowed = param.isMixerAllowed;
+                if (param.lat != null) project.lat = param.lat;
+                if (param.lon != null) project.lon = param.lon;
+                if (param.timeSlotId != null) project.time_slot_id = param.timeSlotId;
+                if (param.batchingPlantId != null) project.batching_plant_id = param.batchingPlantId;
+                if (param.productId != null) project.product_material_id = param.productId;
+                if (param.slumpCode != null) project.slump_code = param.slumpCode;
+                if (param.volume != null) project.volume = param.volume;
+                if (param.labCode != null) project.lab_code = param.labCode;
+                if (param.price != null) project.price = param.price;
+                if (param.finalPrice != null) project.final_price = param.finalPrice;
+                if (param.shipmentDate != null) project.shipment_date = param.shipmentDate;
+                if (param.shipmentInterval != null) project.shipment_interval = param.shipmentInterval;
+                if (param.projectStatus != null) project.status_id = param.projectStatus.Value;
+                if (param.customerId != null) project.customer_id = param.customerId;
+                if (param.salesId != null) project.sales_id = param.salesId;
+                if (param.source != null) project.updated_by = param.source;
+                if (param.projectStatus != null) project.status_id = param.projectStatus.Value;
                 project.updated_date = System.DateTime.Now;
 
                 _db.SaveChanges();
@@ -196,13 +209,14 @@ namespace InovaTrackApi_SBB.DataModel
             public bool? isMixerAllowed { get; set; }
             public double? lat { get; set; }
             public double? lon { get; set; }
-            public int timeSlotId { get; set; }
+            public int? timeSlotId { get; set; }
             public int? batchingPlantId { get; set; }
-            public long productId { get; set; }
+            public long? productId { get; set; }
             public string slumpCode { get; set; }
             public string labCode { get; set; }
             public decimal? volume { get; set; }
             public decimal? price { get; set; }
+            public decimal? finalPrice { get; set; }
             public DateTime? shipmentDate { get; set; }
             public int? shipmentInterval { get; set; }
         }
@@ -225,14 +239,20 @@ namespace InovaTrackApi_SBB.DataModel
             public string gradeCode { get; set; }
             public string gradeName { get; set; }
             public string slumpName { get; set; }
-            public string LabName { get; set; }
+            public string labName { get; set; }
+            public string labAddress { get; set; }
+            public decimal? qcPrice { get; set; }
+            public decimal? paidOff { get; set; }
             public int shipmentCount { get; set; }
+            public decimal volumeCount { get; set; }
             public short? totalShipmet { get; set; }
-            public short projectStatus { get; set; }
+            public short? projectStatus { get; set; }
             public string statusString { get; set; }
             public DateTime? dateTime { get; set; }
             public string source { get; set; } // c or s
             public int? customerId { get; set; }
+            public string customerName { get; set; }
+            public string customerAvatar { get; set; }
             public string salesId { get; set; }
         }
     }

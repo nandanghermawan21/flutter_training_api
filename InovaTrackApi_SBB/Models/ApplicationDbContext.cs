@@ -30,5 +30,10 @@ namespace InovaTrackApi_SBB.Models
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleDriver> VehicleDrivers { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<BankAccount> BankAccounts { get; set; }
+        public DbSet<ProjectPayment> peojectPayments { get; set; }
+        public DbSet<VisitLog> VisitLogs { get; set; }
+        public DbSet<Sales> Saleses { get; set; }
+        public DbSet<SalesCustomer> salesCustomers { get; set; }
     }
 }

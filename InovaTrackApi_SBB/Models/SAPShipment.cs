@@ -35,7 +35,7 @@ namespace InovaTrackApi_SBB.Models
       public int? remaining_quantity_sap {get; set;}
       public int? flag_pecahldt {get; set;}
       public int? fl_fullyload {get; set;}
-      public int? kirim_quantity {get; set;}
+      public decimal? kirim_quantity {get; set;}
       public int? remaining_quantity_calculation {get; set;}
       public int? fullfilled_percentage {get; set;}
       public DateTime? request_date {get; set;}

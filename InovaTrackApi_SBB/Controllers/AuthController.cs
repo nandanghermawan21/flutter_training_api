@@ -1,5 +1,5 @@
 ﻿using InovaTrackApi_SBB.DataModel;
-using InovaTrackApi_SBB.Models;
+using InovaTrackApi_SBB.Helper;
 using InovaTrackApi_SBB.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +23,7 @@ namespace InovaTrackApi_SBB.Controllers
             var user = authService.Authenticate(request.UserName, request.Password);
 
             if (user == null)
-                return BadRequest(new { message = "User Name or Password is incorrect" });
+                return BadRequest("User Name or Password is incorrect");
 
             return Ok(new
             {
@@ -44,34 +44,50 @@ namespace InovaTrackApi_SBB.Controllers
 
         [Route("customer-login")]
         [HttpPost]
-        public ActionResult CustomerLogin([FromBody]CustomerLoginModel request)
+        public ActionResult CustomerLogin([FromBody]UserLoginModel request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var customer = authService.AuthenticateCustomer(request.Email, request.Password);
+            var customer = authService.AuthenticateCustomer(request.UserName, request.Password);
 
             if (customer == null)
-                return BadRequest(new { message = "Email or Password is incorrect" });
-
+                return BadRequest(GlobalData.get.resource.emailOrPasswordInCorrect);
             customer.Password = null;
             return Ok(customer);
         }
 
-        //[Route("driver-login")]
-        //[HttpPost]
-        //public ActionResult DriverLogin([FromBody]CustomerLoginModel request)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        [Route("sales-login")]
+        [HttpPost]
+        public ActionResult SalesLogin([FromBody]UserLoginModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    var driver = authService.AuthenticateDriver(request.Email, request.Password);
+            var sales = authService.AuthenticateSales(request.UserName, request.Password);
 
-        //    if (driver == null)
-        //        return BadRequest(new { message = "Email or Password is incorrect" });
+            if (sales == null)
+                return BadRequest(GlobalData.get.resource.emailOrPasswordInCorrect);
 
-        //    driver.Password = null;
-        //    return Ok(driver);
-        //}
+            sales.password = null;
+            return Ok(sales);
+        }
+
+        [Route("driver-login")]
+        [HttpPost]
+        public ActionResult DriverLogin([FromBody]UserLoginModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var driver = authService.AuthenticateDriver(request.UserName, request.Password);
+
+            if (driver == null)
+                return BadRequest(GlobalData.get.resource.emailOrPasswordInCorrect);
+
+            driver.password = null;
+            return Ok(driver);
+        }
+
     }
 }

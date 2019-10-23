@@ -53,7 +53,7 @@ namespace InovaTrackApi_SBB.DataModel
                     .GetDistanceTo(coord)).Take(count.HasValue ? count.Value : 5);
             }
             var data = (from bachingplant in qData
-                        let qcLab = _db.QcLabs.FirstOrDefault(x => bachingplant.BatchingPlantId.ToString() == x.lab_code)
+                        let qcLab = _db.QcLabs.FirstOrDefault(x => bachingplant.BatchingPlantCode == x.lab_code)
                         select new BatchingPlantModel()
                         {
                             BatchingPlantId = bachingplant.BatchingPlantId,
@@ -71,11 +71,12 @@ namespace InovaTrackApi_SBB.DataModel
                             labLon = qcLab.longitude,
                             labType = qcLab.lab_type,
                             labRemarks = qcLab.remarks,
+                            qcPrice = qcLab.qc_price,
                         }).ToList();
             return data;
         }
 
-      
+
 
 
     }
