@@ -14,10 +14,12 @@ namespace InovaTrackApi_SBB.DataModel
         #region contructor
 
         private ApplicationDbContext _db;
-        public ProductModel() { }
-        public ProductModel(ApplicationDbContext db, IOptions<AppSettings> config)
+        private AppSettings _config;
+
+        public ProductModel(ApplicationDbContext db,AppSettings config)
         {
             _db = db;
+            _config = config;
         }
 
         #endregion
@@ -47,7 +49,7 @@ namespace InovaTrackApi_SBB.DataModel
                         join b in _db.ProductStructureType on a.StructureCode equals b.StructureCode
                         join c in _db.ProductGrades on a.GradeCode equals c.GradeCode
                         let img = imageIncluded ? _db.ProductImages.FirstOrDefault((x) => x.productId == a.MaterialId) : null
-                        select new ProductModel
+                        select new ProductModel(_db,_config)
                         {
                             id = (int)a.MaterialId,
                             description = a.Description,

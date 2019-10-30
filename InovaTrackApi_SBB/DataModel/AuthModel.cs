@@ -19,7 +19,7 @@ namespace InovaTrackApi_SBB.DataModel
             public string name;
             public string email;
             public string phone;
-            public string addrss;
+            public string address;
             public string avatar;
         }
 

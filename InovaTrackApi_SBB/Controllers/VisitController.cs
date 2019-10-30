@@ -19,20 +19,22 @@ namespace InovaTrackApi_SBB.Controllers
     {
         private ApplicationDbContext _db;
         private VisitModel _visitModel;
+        private ProjectModel _projectModel;
 
         public VisitController(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
             _visitModel = new VisitModel(db, config);
+            _projectModel = new ProjectModel(db, config.Value);
         }
 
         [Route("get")]
         [HttpGet]
-        public ActionResult get(int? visitId = null)
+        public ActionResult get(int? visitId = null, string salesId = null)
         {
             try
             {
-                var data = _visitModel.get(visitId: visitId);
+                var data = _visitModel.get(visitId: visitId, salesId: salesId);
                 return Ok(data);
             }
             catch (Exception e)
@@ -53,8 +55,8 @@ namespace InovaTrackApi_SBB.Controllers
                 switch (aktor)
                 {
                     case Actor.sales:
-                        string salesId = (User.FindFirst(ClaimTypes.Sid)?.Value);
-                        var visit = _visitModel.createVisit(data);
+                        string salesSource = (User.FindFirst(ClaimTypes.Sid)?.Value);
+                        var visit = _visitModel.createVisit(data, salesSource);
                         return Ok(visit);
 
                     default:
@@ -70,8 +72,8 @@ namespace InovaTrackApi_SBB.Controllers
         }
 
         [Route("confirm")]
-        [HttpGet]
-        public ActionResult confirm(long visitId, bool byVisit, double lat, double lon)
+        [HttpPost]
+        public ActionResult confirm(ConfirmVisit data)
         {
             try
             {
@@ -82,7 +84,7 @@ namespace InovaTrackApi_SBB.Controllers
                 {
                     case Actor.sales:
                         string salesId = (User.FindFirst(ClaimTypes.Sid)?.Value);
-                        var visit = _visitModel.confirmVisit(visitId, byVisit, salesId, lat, lon);
+                        var visit = _visitModel.confirmVisit(data, salesId);
                         return Ok(visit);
 
 
@@ -99,7 +101,7 @@ namespace InovaTrackApi_SBB.Controllers
 
         [Route("confirm/data")]
         [HttpPost]
-        public ActionResult confirmdata(ConfirmVisitParam data)
+        public ActionResult confirmdata(ConfirmVisiData data)
         {
             try
             {

@@ -19,27 +19,30 @@ namespace InovaTrackApi_SBB.DataModel
         {
             _db = db;
             _config = config.Value;
-            _product = new ProductModel(db, config);
+            _product = new ProductModel(db, config.Value);
         }
 
-        public ShipmentModel()
-        {
+        //public ShipmentModel()
+        //{
 
-        }
+        //}
         #endregion
 
         #region parameter
 
         #endregion
 
-        public IQueryable<ShipmentDetail> get(string projectId = null, int? shipmentId = null, bool? imageInclude = false)
+        public IQueryable<ShipmentDetail> get(string projectId = null, int? shipmentId = null, int? driverId = null, bool? imageInclude = false)
         {
             IQueryable<Project> qProject = _db.Projects;
             IQueryable<ShipmentActivity> qShipmentAct = _db.ShipmentActivities;
+            IQueryable<Driver> qDriver = _db.Drivers;
 
             if (!string.IsNullOrEmpty(projectId)) qProject = qProject.Where(x => x.id == projectId);
 
             if (shipmentId.HasValue) qShipmentAct = _db.ShipmentActivities.Where(x => x.id == shipmentId);
+
+            if (driverId.HasValue) qDriver = _db.Drivers.Where(x => x.driverId == driverId);
 
 
             var data = (from project in qProject
@@ -48,7 +51,7 @@ namespace InovaTrackApi_SBB.DataModel
                         join shipmenactivity in qShipmentAct on shipment.LdtP_no equals shipmenactivity.ticket_number
                         join vehicle in _db.Vehicles on shipmenactivity.truck_number equals vehicle.vehicle_number
                         join vehicledriver in _db.VehicleDrivers on vehicle.vehicle_id equals vehicledriver.vehicle_id
-                        join diverData in _db.Drivers on vehicledriver.driver_id equals diverData.driverId
+                        join diverData in qDriver on vehicledriver.driver_id equals diverData.driverId
                         let currentPosition = _db.Positions.Where(x => x.vehicle_id == vehicle.vehicle_id).OrderByDescending(x => x.date_time).FirstOrDefault()
                         let historyPosition = _db.Positions.Where(x => x.vehicle_id == vehicle.vehicle_id && x.date_time >= (shipmenactivity.begin_loading_time ?? System.DateTime.Now) && x.date_time <= (shipmenactivity.available_time ?? System.DateTime.Now))
                         select new ShipmentDetail
@@ -79,6 +82,9 @@ namespace InovaTrackApi_SBB.DataModel
                             }).ToList(),
                             shipmentSummary = new ShipmentSummary
                             {
+                                confirmStatus = shipmenactivity.confirm_status ?? 0,
+                                confirmNote = shipmenactivity.confirm_note,
+                                confirmDate = shipmenactivity.confirm_date,
                                 datetime = shipmenactivity.created_date,
                                 batchingPlantName = batchingPlant.BatchingPlantName,
                                 customerName = project.shipto_name,
@@ -92,6 +98,7 @@ namespace InovaTrackApi_SBB.DataModel
                                 driverName = diverData.driverName,
                                 statusId = shipmenactivity.readStatus().statusId,
                                 status = shipmenactivity.readStatus().status,
+                                driverId = diverData.driverId,
                             },
                             shipmentStatus = new ShipmentStatus
                             {
@@ -154,6 +161,8 @@ namespace InovaTrackApi_SBB.DataModel
                     if (status.podTime != null) shipment.pod_time = status.podTime;
                     if (status.podFile1 != null) shipment.pod_file1 = status.podFile1;
                     if (status.podFile2 != null) shipment.pod_file2 = status.podFile2;
+                    if (status.podFile1 != null) shipment.pod_file1 = status.podFile1;
+                    if (status.podFile2 != null) shipment.pod_file2 = status.podFile2;
                     if (status.returningTime != null) shipment.returning_time = status.returningTime;
                     if (status.availableTime != null) shipment.available_time = status.availableTime;
                     if (status.isEmergency != null) shipment.is_emergency = status.isEmergency;
@@ -173,9 +182,9 @@ namespace InovaTrackApi_SBB.DataModel
             return data;
         }
 
-        public List<ShipmentSummary> getSummary(string projectId = null, int? shipmentId = null)
+        public List<ShipmentSummary> getSummary(string projectId = null, int? shipmentId = null, int? driverId = null)
         {
-            IQueryable<ShipmentDetail> qDetail = get(projectId: projectId, shipmentId: shipmentId);
+            IQueryable<ShipmentDetail> qDetail = get(projectId: projectId, shipmentId: shipmentId, driverId: driverId);
 
             return (from a in qDetail select a.shipmentSummary).ToList();
         }
@@ -215,15 +224,29 @@ namespace InovaTrackApi_SBB.DataModel
 
             if (!string.IsNullOrEmpty(emergencyId)) qEmergency = qEmergency.Where(x => x.emergency_file_guid == emergencyId);
 
-            var data = (from a in qEmergency
+            var data = (from emergency in qEmergency
+                        join delivery in _db.ShipmentActivities on emergency.delivery_id equals delivery.id
+                        join vehicle in _db.Vehicles on delivery.truck_number equals vehicle.vehicle_number
+                        join vehicleDriver in _db.VehicleDrivers on vehicle.vehicle_id equals vehicleDriver.vehicle_id
+                        join driver in _db.Drivers on vehicleDriver.driver_id equals driver.driverId
+                        join sapShipment in _db.SAPShipments on delivery.ticket_number equals sapShipment.LdtP_no
+                        join project in _db.Projects on sapShipment.shipment_no equals project.sap_shipment_no
                         select new EmergencyResponse
                         {
-                            id = a.emergency_file_guid,
-                            shipmentId = a.delivery_id,
-                            ticketNumber = a.ticket_number,
-                            dateTime = a.emergency_time,
-                            file = a.emergency_file,
+                            id = emergency.emergency_file_guid,
+                            note = emergency.emergency_note,
+                            shipmentId = emergency.delivery_id,
+                            ticketNumber = delivery.ticket_number,
+                            dateTime = emergency.emergency_time,
+                            file = $"{_config.DownloadBaseUrl}/{emergency.emergency_file}",
+                            driverId = delivery.id,
+                            driverName = driver.driverName,
+                            vehicleId = vehicle.vehicle_id,
+                            vehicleNumber = vehicle.vehicle_number,
+                            statusId = delivery.readStatus().statusId,
+                            projectId = project.id,
                         }).ToList();
+
 
             return data;
         }
@@ -232,7 +255,7 @@ namespace InovaTrackApi_SBB.DataModel
         {
             var emergency = new ShipmentEmergency()
             {
-                emergency_file = data.file,
+                emergency_file = UploadHelper.saveImage(data.file, _config, "emergency"),
                 emergency_note = data.note,
                 delivery_id = data.shipmentId,
                 emergency_time = System.DateTime.Now,
@@ -246,9 +269,6 @@ namespace InovaTrackApi_SBB.DataModel
             return getEmergency(data.shipmentId, emergency.emergency_file_guid);
 
         }
-
-
-
 
         /// <summary>
         /// response shipment base
@@ -270,8 +290,10 @@ namespace InovaTrackApi_SBB.DataModel
         /// </summary>
         public class ShipmentSummary : Shipnent
         {
+            public short confirmStatus { get; set; }
+            public string confirmNote { get; set; }
+            public DateTime? confirmDate { get; set; }
             public DateTime? datetime { get; set; }
-
             public string batchingPlantName { get; set; }
             public string customerName { get; set; }
             public string shiptoAddress { get; set; }

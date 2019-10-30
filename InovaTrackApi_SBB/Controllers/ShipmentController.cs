@@ -8,7 +8,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using static InovaTrackApi_SBB.DataModel.AuthModel;
 using static InovaTrackApi_SBB.DataModel.ShipmentModel;
 
 namespace InovaTrackApi_SBB.Controllers
@@ -30,11 +32,11 @@ namespace InovaTrackApi_SBB.Controllers
 
         [Route("get")]
         [HttpGet]
-        public ActionResult Get(string projectId = null, int? shipmentId = null)
+        public ActionResult Get(string projectId = null, int? shipmentId = null, int? driverId = null)
         {
             try
             {
-                var data = _shipmentModel.get(projectId: projectId, shipmentId: shipmentId);
+                var data = _shipmentModel.get(projectId: projectId, shipmentId: shipmentId, driverId: driverId);
 
                 return Ok(data.ToList());
             }
@@ -46,13 +48,28 @@ namespace InovaTrackApi_SBB.Controllers
 
         [Route("summary")]
         [HttpGet]
-        public ActionResult Summary(string projectId = null, int? shipmentId = null)
+        public ActionResult Summary(string projectId = null, int? shipmentId = null, int? driverId = null)
         {
+
+
             try
             {
-                var data = _shipmentModel.getSummary(projectId: projectId, shipmentId: shipmentId);
+                //claim user to get actor
+                var aktor = User.FindFirst(ClaimTypes.Actor)?.Value;
+
+                switch (aktor)
+                {
+                    //override driver id if login by driver
+                    case Actor.driver:
+                        driverId = int.Parse((User.FindFirst(ClaimTypes.Sid)?.Value));
+                        break;
+                }
+
+                var data = _shipmentModel.getSummary(projectId: projectId, shipmentId: shipmentId, driverId: driverId).OrderByDescending(x => x.datetime);
 
                 return Ok(data);
+
+
             }
             catch (Exception e)
             {

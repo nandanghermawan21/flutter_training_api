@@ -12,20 +12,16 @@ namespace InovaTrackApi_SBB.DataModel
     {
         #region contructor
         private ApplicationDbContext _db;
-        private readonly AppSettings _config;
+        private  AppSettings _config;
         private ProductModel _product;
 
-        public ProjectModel(ApplicationDbContext db, IOptions<AppSettings> config)
+        public ProjectModel(ApplicationDbContext db, AppSettings config)
         {
             _db = db;
-            _config = config.Value;
+            _config = config;
             _product = new ProductModel(db, config);
         }
 
-        public ProjectModel()
-        {
-
-        }
         #endregion
 
         #region properties
@@ -34,11 +30,6 @@ namespace InovaTrackApi_SBB.DataModel
 
         #endregion
 
-        public ProjectModel setDb(ApplicationDbContext db)
-        {
-            _db = db;
-            return this;
-        }
 
         public List<ResponseModel> get(int? customerId = null, string salesId = null, string id = null)
         {
@@ -106,7 +97,7 @@ namespace InovaTrackApi_SBB.DataModel
                             source = project.source,
                             customerId = project.customer_id,
                             customerName = customer.CustomerName,
-                            customerAvatar = customer.customerAvatar,
+                            customerAvatar =  $@"{_config.DownloadBaseUrl}\{customer.customerAvatar}",
                             salesId = project.sales_id,
                         }).ToList();
 
@@ -203,6 +194,7 @@ namespace InovaTrackApi_SBB.DataModel
 
         public class CreateModel
         {
+            public int customerId { get; set; }
             public string name { get; set; }
             public string shiptoName { get; set; }
             public string shiptoAdrress { get; set; }
@@ -230,7 +222,7 @@ namespace InovaTrackApi_SBB.DataModel
         {
             public string id { get; set; }
             public string shipmentNo { get; set; }
-            public TimeSpan timeSlot { get; set; }
+            public TimeSpan? timeSlot { get; set; }
             public string batchingPlantName { get; set; }
             public double? batchingPlantLat { get; set; }
             public double? batchingPlantLong { get; set; }
@@ -243,8 +235,8 @@ namespace InovaTrackApi_SBB.DataModel
             public string labAddress { get; set; }
             public decimal? qcPrice { get; set; }
             public decimal? paidOff { get; set; }
-            public int shipmentCount { get; set; }
-            public decimal volumeCount { get; set; }
+            public int? shipmentCount { get; set; }
+            public decimal? volumeCount { get; set; }
             public short? totalShipmet { get; set; }
             public short? projectStatus { get; set; }
             public string statusString { get; set; }

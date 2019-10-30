@@ -32,7 +32,7 @@ namespace InovaTrackApi_SBB.Services
 
         public User Authenticate(string username, string password)
         {
-            var hash = PasswordHasher.Hash(username, password);
+            var hash = PasswordHasher.Hash("", password);
             var user = db.Users.SingleOrDefault(x => x.UserName == username && x.Password == hash);
 
             // return null if user not found
@@ -62,17 +62,15 @@ namespace InovaTrackApi_SBB.Services
 
         public Customer AuthenticateCustomer(string userId, string password)
         {
-            var hash = PasswordHasher.Hash(userId, password);
+            var hash = PasswordHasher.Hash("", password);
 
             var customer = db.Customers.SingleOrDefault(x => x.Email == userId && x.Password == hash && x.IsDeleted != true);
-
-            
 
             // return null if user not found
             if (customer == null)
             {
                 //check with no telpon
-                customer = new CustomerModel(db).CheckPhoneExist(userId);
+                customer = new CustomerModel(db, _appSettings).CheckPhoneExist(userId);
 
                 if (customer == null)
                     return null;
@@ -82,6 +80,8 @@ namespace InovaTrackApi_SBB.Services
 
             }
 
+            //cahange immage url
+            customer.customerAvatar = $@"{_appSettings.DownloadBaseUrl}\{customer.customerAvatar}";
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -109,7 +109,7 @@ namespace InovaTrackApi_SBB.Services
 
         public Sales AuthenticateSales(string email, string password)
         {
-            var hash = PasswordHasher.Hash(email, password);
+            var hash = PasswordHasher.Hash("", password);
             var sales = db.Saleses.SingleOrDefault(x => x.email == email && x.password == hash && x.isdeleted != true);
 
             // return null if user not found
@@ -143,7 +143,7 @@ namespace InovaTrackApi_SBB.Services
 
         public Driver AuthenticateDriver(string email, string password)
         {
-            var hash = PasswordHasher.Hash(email, password);
+            var hash = PasswordHasher.Hash("", password);
             var driver = db.Drivers.FirstOrDefault(x => x.email == email && x.password == hash);
 
             // return null if user not found

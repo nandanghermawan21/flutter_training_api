@@ -23,7 +23,7 @@ namespace InovaTrackApi_SBB.Controllers
         {
             _db = db;
             _config = config.Value;
-            _product = new ProductModel(db, config);
+            _product = new ProductModel(db, _config);
         }
 
         [Route("slumps")]

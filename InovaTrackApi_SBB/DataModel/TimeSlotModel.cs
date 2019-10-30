@@ -19,7 +19,7 @@ namespace InovaTrackApi_SBB.DataModel
         {
             _db = db;
             _config = config.Value;
-            _product = new ProductModel(db, config);
+            _product = new ProductModel(db, config.Value);
         }
 
         public TimeSlotModel()

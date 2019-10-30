@@ -20,7 +20,7 @@ namespace InovaTrackApi_SBB.DataModel
         public VisitModel(ApplicationDbContext db, IOptions<AppSettings> config)
         {
             _db = db;
-            _projectModel = new ProjectModel(db, config);
+            _projectModel = new ProjectModel(db, config.Value);
         }
 
         #endregion
@@ -37,6 +37,7 @@ namespace InovaTrackApi_SBB.DataModel
 
 
             var data = (from a in qVisit
+                        join customer in _db.Customers on a.customer_id equals (int)customer.CustomerId
                         select new VisitResponse
                         {
                             visitId = a.logid,
@@ -45,7 +46,7 @@ namespace InovaTrackApi_SBB.DataModel
                             projectId = a.project_id,
                             visitDate = a.visit_date,
                             note = a.note,
-                            addess = a.address,
+                            address = a.address,
                             lat = a.lat,
                             lon = a.lon,
                             sourceSalesId = a.source_sales_nik,
@@ -56,45 +57,26 @@ namespace InovaTrackApi_SBB.DataModel
                             confirmPercentage = a.confirm_persentage,
                             confirmVisitLat = a.confirm_visit_lat,
                             confirmVisitLon = a.confirm_visit_lon,
+                            confirmVisitAddress = a.confirm_visit_address,
                             dataProject = a.dataProject,
+                            customerName = customer.CustomerName,
                         }
                         ).ToList();
 
             return data;
         }
 
-        public VisitResponse confirmVisit(long visitId, bool byVisit, string salesId, double lat, double lon)
-        {
-            var data = _db.VisitLogs.FirstOrDefault(x => x.logid == visitId);
-
-            if (data != null)
-            {
-                data.by_visit = byVisit;
-                data.confirm_visit_date = System.DateTime.Now;
-                data.modified_by = salesId;
-                data.modified_date = data.confirm_visit_date;
-                data.confirm_visit_lat = lat;
-                data.confirm_visit_lon = lon;
-
-                _db.SaveChanges();
-                return get(visitId: visitId).First();
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public VisitResponse createVisit(Visitparam data)
+        public VisitResponse createVisit(Visitparam data, string salesSource)
         {
             var visitLog = new VisitLog
             {
                 sales_nik = data.salesId,
+                source_sales_nik = salesSource,
                 customer_id = data.customerId,
                 project_id = data.projectId,
                 visit_date = data.visitDate,
                 note = data.note,
-                address = data.addess,
+                address = data.address,
                 lat = data.lat,
                 lon = data.lon,
             };
@@ -106,14 +88,37 @@ namespace InovaTrackApi_SBB.DataModel
             return get(visitId: visitLog.logid).First();
         }
 
-        public VisitResponse confirmVisitData(ConfirmVisitParam data, string salesId)
+        public VisitResponse confirmVisit(ConfirmVisit data, string salesId)
         {
             var visitLog = _db.VisitLogs.FirstOrDefault(x => x.logid == data.visitId);
 
             if (visitLog != null)
             {
-                visitLog.confirm_persentage = data.percentage;
+                visitLog.by_visit = data.byVisit;
+                visitLog.confirm_visit_date = DateTime.Now;
+                visitLog.confirm_visit_lat = data.confirmVisitLat;
+                visitLog.confirm_visit_lon = data.confirmVisitLon;
+                visitLog.confirm_visit_address = data.confirmVisitAddress;
+                visitLog.modified_by = salesId;
+                visitLog.modified_date = System.DateTime.Now;
+
+                _db.SaveChanges();
+                return get(visitId: data.visitId).First();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public VisitResponse confirmVisitData(ConfirmVisiData data, string salesId)
+        {
+            var visitLog = _db.VisitLogs.FirstOrDefault(x => x.logid == data.visitId);
+
+            if (visitLog != null)
+            {
                 visitLog.confirm_visit_note = data.confirmNote;
+                visitLog.confirm_persentage = data.percentage;
                 visitLog.modified_by = salesId;
                 visitLog.modified_date = System.DateTime.Now;
                 visitLog.dataProject = JsonConvert.SerializeObject(_projectModel.get(id: visitLog.project_id)?.First());
@@ -135,10 +140,13 @@ namespace InovaTrackApi_SBB.DataModel
             public bool? isDone { get; set; }
             public DateTime? confirmVisitDate { get; set; }
             public string cofirmVisitNote { get; set; }
-            public short confirmPercentage { get; set; }
+            public short? confirmPercentage { get; set; }
             public double? confirmVisitLat { get; set; }
             public double? confirmVisitLon { get; set; }
+            public string confirmVisitAddress { get; set; }
             public string dataProject { get; set; }
+            public string customerName { get; set; }
+            public string projectName { get; set; }
         }
 
         public class Visitparam
@@ -148,15 +156,24 @@ namespace InovaTrackApi_SBB.DataModel
             public string projectId { get; set; }
             public DateTime? visitDate { get; set; }
             public string note { get; set; }
-            public string addess { get; set; }
-            public double lat { get; set; }
-            public double lon { get; set; }
+            public string address { get; set; }
+            public double? lat { get; set; }
+            public double? lon { get; set; }
         }
 
-        public class ConfirmVisitParam
+        public class ConfirmVisit
         {
             public long visitId { get; set; }
-            public short percentage { get; set; }
+            public bool byVisit { get; set; }
+            public double? confirmVisitLat { get; set; }
+            public double? confirmVisitLon { get; set; }
+            public string confirmVisitAddress { get; set; }
+        }
+
+        public class ConfirmVisiData
+        {
+            public long visitId { get; set; }
+            public short? percentage { get; set; }
             public string confirmNote { get; set; }
         }
 

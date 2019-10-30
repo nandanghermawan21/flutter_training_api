@@ -28,7 +28,7 @@ namespace InovaTrackApi_SBB.Controllers
         {
             _db = db;
             _config = config.Value;
-            _projectModel = new ProjectModel(db, config);
+            _projectModel = new ProjectModel(db, _config);
         }
 
         [Route("get")]
@@ -65,23 +65,24 @@ namespace InovaTrackApi_SBB.Controllers
 
         [Route("create")]
         [HttpPost]
-        public ActionResult CreateProject(ProjectModel.CreateModel data, int? customerId = null, short? status = null)
+        public ActionResult CreateProject(ProjectModel.CreateModel data, short? status = null)
         {
             try
             {
                 //claim user to get actor
-                var project = new ProjectModel();
+                var project = new ProjectModel(_db, _config);
                 project.readParamFromObj(data);
                 project.param.source = User.FindFirst(ClaimTypes.Actor)?.Value;
                 switch (project.param.source)
                 {
                     case Actor.customer:
+                        string salesId = "12121212"; //change this variable to function get related sales
+                        project.param.salesId = salesId;
                         project.param.customerId = int.Parse(User.FindFirst(ClaimTypes.Sid)?.Value);
                         break;
 
                     case Actor.sales:
                         project.param.salesId = User.FindFirst(ClaimTypes.Sid)?.Value;
-                        project.param.customerId = customerId;
                         break;
 
                     default:
@@ -93,7 +94,7 @@ namespace InovaTrackApi_SBB.Controllers
                     project.param.projectStatus = status.Value;
                 }
 
-                project.setDb(_db).create();
+                project.create();
 
                 return Ok(project.param);
             }
@@ -128,7 +129,7 @@ namespace InovaTrackApi_SBB.Controllers
 
 
                 //claim user to get actor
-                var project = new ProjectModel();
+                var project = new ProjectModel(_db, _config);
                 project.readParamFromObj(data);
 
 
@@ -137,7 +138,7 @@ namespace InovaTrackApi_SBB.Controllers
                     project.param.projectStatus = status.Value;
                 }
 
-                project.setDb(_db).update(actor);
+                project.update(actor);
 
                 return Ok(project.param);
             }

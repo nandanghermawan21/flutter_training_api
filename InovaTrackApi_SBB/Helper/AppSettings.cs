@@ -16,7 +16,8 @@ namespace InovaTrackApi_SBB.Helper
         public string GinotaApiKey { get; set; }
         public string GinotaApiSecreet { get; set; }
         public string GinotaSender { get; set; }
-
+        public string UploadLocation { get; set; }
+        public string DownloadBaseUrl { get; set; }
 
     }
 }

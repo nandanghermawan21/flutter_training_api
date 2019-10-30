@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static InovaTrackApi_SBB.DataModel.AuthModel;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Collections.Generic;
 
 namespace InovaTrackApi_SBB.Controllers
 {
@@ -27,7 +29,7 @@ namespace InovaTrackApi_SBB.Controllers
 
             _db = db;
             _config = config.Value;
-            _customer = new CustomerModel(db);
+            _customer = new CustomerModel(db, _config);
         }
 
         [Route("forgot-password")]
@@ -56,7 +58,7 @@ namespace InovaTrackApi_SBB.Controllers
                     phoneNumber = phoneNumber,
                     flash = false,
                     senderName = _config.GinotaSender,
-                    content = $"{GlobalData.get.resource.thereIsTheCodeToResetYourPassword} {code} {GlobalData.get.resource.pleaseDoNotShareThisCodeWithAnyone}",
+                    content = $" {code} {GlobalData.get.resource.thereIsTheCodeToResetYourPassword} {GlobalData.get.resource.pleaseDoNotShareThisCodeWithAnyone}",
                 });
 
                 if (a != null)
@@ -102,7 +104,7 @@ namespace InovaTrackApi_SBB.Controllers
 
             try
             {
-                var psw = PasswordHasher.Hash(customer.Email, data.NewPassword);
+                var psw = PasswordHasher.Hash("", data.NewPassword);
                 customer.Password = psw;
                 await _db.SaveChangesAsync();
 
@@ -147,7 +149,8 @@ namespace InovaTrackApi_SBB.Controllers
                 var model = new Customer
                 {
                     Email = data.Email,
-                    Password = PasswordHasher.Hash(data.Email, data.Password),
+                    //Password = PasswordHasher.Hash(data.Email, data.Password),
+                    Password = PasswordHasher.Hash("", data.Password),
                     MobileNumber = data.MobileNumber,
                     CustomerName = data.FirstName + (!string.IsNullOrEmpty(data.LastName) ? " " + data.LastName : ""),
                     CreatedDate = DateTime.Now
@@ -174,8 +177,9 @@ namespace InovaTrackApi_SBB.Controllers
                     CustomerId = id,
                     Email = profile.email,
                     CustomerName = profile.name,
-                    Address1 = profile.addrss,
+                    Address1 = profile.address,
                     customerAvatar = profile.avatar,
+                    MobileNumber = profile.phone,
                 };
 
                 customer = _customer.update(customer);
@@ -183,7 +187,14 @@ namespace InovaTrackApi_SBB.Controllers
                 if (customer == null)
                     return BadRequest(GlobalData.get.resource.customerNotFound);
 
-                return Ok(customer);
+                return Ok(new ProfileModel()
+                {
+                    name = customer.CustomerName,
+                    address = customer.Address1,
+                    avatar = customer.customerAvatar,
+                    email = customer.Email,
+                    phone = customer.MobileNumber
+                });
             }
             catch (Exception e)
             {
@@ -198,14 +209,34 @@ namespace InovaTrackApi_SBB.Controllers
         {
             try
             {
-                var data = _customer.get(userId: id, salesId: salesId);
-                return Ok(data);
+                //var data = _customer.custemersSales(userId: id, salesId: salesId);
+                //return Ok(data);
+
+                //claim user to get actor
+                var aktor = User.FindFirst(ClaimTypes.Actor)?.Value;
+                List<Customer> customer = new List<Customer>();
+                switch (aktor)
+                {
+                    case Actor.sales:
+                        salesId = (User.FindFirst(ClaimTypes.Sid)?.Value);
+                        customer = _customer.custemersSales(userId: id, salesId: salesId);
+                        return Ok(customer);
+
+                    case Actor.customer:
+                        id = int.Parse(User.FindFirst(ClaimTypes.Sid)?.Value);
+                        customer = _customer.custemersSales(userId: id);
+                        return Ok(customer);
+
+                    default:
+                        return BadRequest(GlobalData.get.resource.thisUserIsNotPermitted);
+                }
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
+
 
         [Route("checkphoneexist")]
         [HttpGet]

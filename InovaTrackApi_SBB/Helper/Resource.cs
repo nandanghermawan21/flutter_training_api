@@ -17,7 +17,7 @@ namespace InovaTrackApi_SBB.Helper
             public string invalidData = "Invalid data";
             public string confirmPaswordNotMatch = "Confirm password is not match";
             public string phoneNumberNotRegistered = "Phone number not registered";
-            public string thereIsTheCodeToResetYourPassword = "There is the code to reset your password";
+            public string thereIsTheCodeToResetYourPassword = "This is the code to reset your password,";
             public string pleaseDoNotShareThisCodeWithAnyone = "please do not share this code with anyone";
             public string success = "Success";
             public string smsFailedToSend = "SMS failed to send";
@@ -78,7 +78,7 @@ namespace InovaTrackApi_SBB.Helper
                     invalidData = "Data tidak valid",
                     confirmPaswordNotMatch = "Konfirmasi kata sandi tidak cocok",
                     phoneNumberNotRegistered = "No telepon tidak terdaftar",
-                    thereIsTheCodeToResetYourPassword = "Berikut ada adalah kode untuk mereset password anda",
+                    thereIsTheCodeToResetYourPassword = "ini adalah kode untuk mereset password anda,",
                     pleaseDoNotShareThisCodeWithAnyone = "mohon tidak memberitahukan kode ini kepada siapapun",
                     success = "sukses",
                     smsFailedToSend = "Gagal mengirim sms",
