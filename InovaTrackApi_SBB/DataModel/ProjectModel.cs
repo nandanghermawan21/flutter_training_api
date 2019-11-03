@@ -194,7 +194,7 @@ namespace InovaTrackApi_SBB.DataModel
 
         public class CreateModel
         {
-            public int customerId { get; set; }
+            public int? customerId { get; set; }
             public string name { get; set; }
             public string shiptoName { get; set; }
             public string shiptoAdrress { get; set; }

@@ -46,6 +46,7 @@ namespace InovaTrackApi_SBB.DataModel
 
 
             var data = (from project in qProject
+                        join customer in _db.Customers on project.customer_id equals (int)customer.CustomerId
                         join batchingPlant in _db.BatchingPlants on project.batching_plant_id equals batchingPlant.BatchingPlantId
                         join shipment in _db.SAPShipments on project.sap_shipment_no equals shipment.shipment_no
                         join shipmenactivity in qShipmentAct on shipment.LdtP_no equals shipmenactivity.ticket_number
@@ -82,12 +83,13 @@ namespace InovaTrackApi_SBB.DataModel
                             }).ToList(),
                             shipmentSummary = new ShipmentSummary
                             {
-                                confirmStatus = shipmenactivity.confirm_status ?? 0,
+                                confirmStatus = shipmenactivity.confirm_status,
                                 confirmNote = shipmenactivity.confirm_note,
                                 confirmDate = shipmenactivity.confirm_date,
                                 datetime = shipmenactivity.created_date,
                                 batchingPlantName = batchingPlant.BatchingPlantName,
-                                customerName = project.shipto_name,
+                                customerName = customer.CustomerName,
+                                shiptoName = project.shipto_name,
                                 shiptoAddress = project.shipto_address,
                                 shipmentId = shipmenactivity.id,
                                 projectId = project.id,
@@ -102,6 +104,9 @@ namespace InovaTrackApi_SBB.DataModel
                             },
                             shipmentStatus = new ShipmentStatus
                             {
+                                confirmStatus = shipmenactivity.confirm_status,
+                                confirmNote = shipmenactivity.confirm_note,
+                                confirmDate = shipmenactivity.confirm_date,
                                 shipmentId = shipmenactivity.id,
                                 projectId = project.id,
                                 ticketNumber = shipmenactivity.ticket_number,
@@ -112,8 +117,8 @@ namespace InovaTrackApi_SBB.DataModel
                                 unloadingByDriver = shipmenactivity.unloading_by_driver,
                                 podRecipientName = shipmenactivity.pod_recipient_name,
                                 podTime = shipmenactivity.pod_time,
-                                podFile1 = imageInclude == true ? shipmenactivity.pod_file1 : null,
-                                podFile2 = imageInclude == true ? shipmenactivity.pod_file2 : null,
+                                podFile1 = imageInclude == true ? $@"{_config.DownloadBaseUrl}/{shipmenactivity.pod_file1}" : null,
+                                podFile2 = imageInclude == true ? $@"{_config.DownloadBaseUrl}/{shipmenactivity.pod_file2}" : null,
                                 returningTime = shipmenactivity.returning_time,
                                 availableTime = shipmenactivity.available_time,
                                 isEmergency = shipmenactivity.is_emergency,
@@ -129,7 +134,7 @@ namespace InovaTrackApi_SBB.DataModel
             return data;
         }
 
-        public ShipmentStatus updateStatus(ShipmentStatus status, int? mode = 2, string modifier = "", bool imageInclude = false)
+        public Object updateStatus(ShipmentStatus status, int? mode = 2, string modifier = "", bool imageInclude = false, ReturnMode returnMode = ReturnMode.Status)
         {
             var shipment = _db.ShipmentActivities.FirstOrDefault(x => x.id == status.shipmentId);
 
@@ -158,14 +163,21 @@ namespace InovaTrackApi_SBB.DataModel
                     if (status.beginUnloadingTime != null) shipment.begin_unloading_time = status.beginUnloadingTime;
                     if (status.unloadingByDriver != null) shipment.unloading_by_driver = status.unloadingByDriver;
                     if (status.podRecipientName != null) shipment.pod_recipient_name = status.podRecipientName;
-                    if (status.podTime != null) shipment.pod_time = status.podTime;
-                    if (status.podFile1 != null) shipment.pod_file1 = status.podFile1;
-                    if (status.podFile2 != null) shipment.pod_file2 = status.podFile2;
-                    if (status.podFile1 != null) shipment.pod_file1 = status.podFile1;
-                    if (status.podFile2 != null) shipment.pod_file2 = status.podFile2;
+                    //if (status.podTime != null) shipment.pod_time = status.podTime;
+                    if (status.podTime != null) shipment.pod_time = System.DateTime.Now;  //override datetime pod to server time
+                    //if (status.podFile1 != null) shipment.pod_file1 = status.podFile1;
+                    //if (status.podFile2 != null) shipment.pod_file2 = status.podFile2;
+                    if (status.podFile1 != null) shipment.pod_file1 = UploadHelper.saveImage(status.podFile1, _config, "pod1");
+                    if (status.podFile2 != null) shipment.pod_file2 = UploadHelper.saveImage(status.podFile2, _config, "pod2");
                     if (status.returningTime != null) shipment.returning_time = status.returningTime;
                     if (status.availableTime != null) shipment.available_time = status.availableTime;
                     if (status.isEmergency != null) shipment.is_emergency = status.isEmergency;
+
+                    //for update confirm status
+                    if (status.confirmStatus != 0) shipment.confirm_status = status.confirmStatus;
+                    //if (status.confirmDate != null) shipment.confirm_date = status.confirmDate;
+                    if (status.confirmStatus != 0) shipment.confirm_date = System.DateTime.Now; //ambil tanggal dari server
+                    if (!string.IsNullOrEmpty(status.confirmNote)) shipment.confirm_note = status.confirmNote;
                 }
 
 
@@ -177,9 +189,20 @@ namespace InovaTrackApi_SBB.DataModel
                 _db.SaveChanges();
             }
 
-            var data = get(shipmentId: status.shipmentId, imageInclude: imageInclude).Select(x => x.shipmentStatus).First();
+            switch (returnMode) {
+                case ReturnMode.Status:
+                    return (get(shipmentId: status.shipmentId, imageInclude: imageInclude).Select(x => x.shipmentStatus).First());
 
-            return data;
+                case ReturnMode.Summary:
+                    return (get(shipmentId: status.shipmentId, imageInclude: imageInclude).Select(x => x.shipmentSummary).First());
+
+                case ReturnMode.All:
+                    return (get(shipmentId: status.shipmentId, imageInclude: imageInclude).FirstOrDefault());
+
+                default:
+                    return (get(shipmentId: status.shipmentId, imageInclude: imageInclude).Select(x => x.shipmentStatus).First());
+            }
+
         }
 
         public List<ShipmentSummary> getSummary(string projectId = null, int? shipmentId = null, int? driverId = null)
@@ -290,12 +313,13 @@ namespace InovaTrackApi_SBB.DataModel
         /// </summary>
         public class ShipmentSummary : Shipnent
         {
-            public short confirmStatus { get; set; }
+            public byte confirmStatus { get; set; }
             public string confirmNote { get; set; }
             public DateTime? confirmDate { get; set; }
             public DateTime? datetime { get; set; }
             public string batchingPlantName { get; set; }
             public string customerName { get; set; }
+            public string shiptoName { get; set; }
             public string shiptoAddress { get; set; }
             public int? volume { get; set; }
             public string status { get; set; }
@@ -319,6 +343,9 @@ namespace InovaTrackApi_SBB.DataModel
         /// </summary>
         public class ShipmentStatus : Shipnent
         {
+            public byte confirmStatus { get; set; }
+            public string confirmNote { get; set; }
+            public DateTime? confirmDate { get; set; }
             public DateTime? beginLoadingTime { get; set; }
             public DateTime? leavePlantTime { get; set; }
             public DateTime? arrivalTime { get; set; }
@@ -332,7 +359,13 @@ namespace InovaTrackApi_SBB.DataModel
             public DateTime? availableTime { get; set; }
             public bool? isEmergency { get; set; }
 
+        }
 
+        public class ShipmentConfirm
+        {
+            public int? shipmentId { get; set; }
+            public byte confirmStatus { get; set; }
+            public string confirmNote { get; set; }
         }
 
         public class Position
@@ -378,5 +411,11 @@ namespace InovaTrackApi_SBB.DataModel
             public string note { get; set; }
         }
 
+        public enum ReturnMode
+        {
+            All,
+            Status,
+            Summary,
+        }
     }
 }

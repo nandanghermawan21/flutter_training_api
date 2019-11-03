@@ -109,6 +109,22 @@ namespace InovaTrackApi_SBB.Controllers
             }
         }
 
+        [Route("status/confirm")]
+        [HttpPost]
+        public ActionResult UpdateConfirm(ShipmentConfirm ShipmentConfirm)
+        {
+            try
+            {
+                var data = _shipmentModel.updateStatus(JsonConvert.DeserializeObject<ShipmentStatus>(JsonConvert.SerializeObject(ShipmentConfirm)), mode: 2, imageInclude: true, returnMode: ReturnMode.Summary);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+
         [Route("pod")]
         [HttpPost]
         public ActionResult Pod(Pod podData)

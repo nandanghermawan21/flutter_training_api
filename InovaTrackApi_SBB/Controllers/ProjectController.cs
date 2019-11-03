@@ -78,7 +78,7 @@ namespace InovaTrackApi_SBB.Controllers
                     case Actor.customer:
                         string salesId = "12121212"; //change this variable to function get related sales
                         project.param.salesId = salesId;
-                        project.param.customerId = int.Parse(User.FindFirst(ClaimTypes.Sid)?.Value);
+                        project.param.customerId = Convert.ToInt32(long.Parse(User.FindFirst(ClaimTypes.Sid)?.Value));
                         break;
 
                     case Actor.sales:
