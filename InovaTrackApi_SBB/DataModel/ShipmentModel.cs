@@ -115,6 +115,8 @@ namespace InovaTrackApi_SBB.DataModel
                                 arrivalTime = shipmenactivity.arrival_time,
                                 beginUnloadingTime = shipmenactivity.begin_loading_time,
                                 unloadingByDriver = shipmenactivity.unloading_by_driver,
+                                unloadingByDriverLat = shipmenactivity.unloading_by_driver_lat,
+                                unloadingByDriverlon = shipmenactivity.unloading_by_driver_lon,
                                 podRecipientName = shipmenactivity.pod_recipient_name,
                                 podTime = shipmenactivity.pod_time,
                                 podFile1 = imageInclude == true ? $@"{_config.DownloadBaseUrl}/{shipmenactivity.pod_file1}" : null,
@@ -127,6 +129,11 @@ namespace InovaTrackApi_SBB.DataModel
                                 vehicleId = vehicle.vehicle_id,
                                 driverName = diverData.driverName,
                                 vehicleNumber = vehicle.vehicle_number,
+                                customerName = customer.CustomerName,
+                                projectName = project.project_name,
+                                rating = shipmenactivity.rating,
+                                ratingNote = shipmenactivity.rating_note,
+                                ratingDate = shipmenactivity.rating_date,
                             }
 
                         });
@@ -161,7 +168,6 @@ namespace InovaTrackApi_SBB.DataModel
                     if (status.leavePlantTime != null) shipment.leave_plant_time = status.leavePlantTime;
                     if (status.arrivalTime != null) shipment.arrival_time = status.arrivalTime;
                     if (status.beginUnloadingTime != null) shipment.begin_unloading_time = status.beginUnloadingTime;
-                    if (status.unloadingByDriver != null) shipment.unloading_by_driver = status.unloadingByDriver;
                     if (status.podRecipientName != null) shipment.pod_recipient_name = status.podRecipientName;
                     //if (status.podTime != null) shipment.pod_time = status.podTime;
                     if (status.podTime != null) shipment.pod_time = System.DateTime.Now;  //override datetime pod to server time
@@ -178,6 +184,19 @@ namespace InovaTrackApi_SBB.DataModel
                     //if (status.confirmDate != null) shipment.confirm_date = status.confirmDate;
                     if (status.confirmStatus != 0) shipment.confirm_date = System.DateTime.Now; //ambil tanggal dari server
                     if (!string.IsNullOrEmpty(status.confirmNote)) shipment.confirm_note = status.confirmNote;
+
+                    //for update unloading by driver
+                    if (status.unloadingByDriver != null) shipment.unloading_by_driver = status.unloadingByDriver;
+                    if (status.unloadingByDriverLat != null) shipment.unloading_by_driver_lat = status.unloadingByDriverLat;
+                    if (status.unloadingByDriverlon != null) shipment.unloading_by_driver_lon = status.unloadingByDriverlon;
+
+                    //for update ratting 
+                    if (status.rating != null) shipment.rating = status.rating;
+                    if (status.ratingNote != null) shipment.rating_note = status.ratingNote;
+                    if (status.ratingDate != null) shipment.rating_date = status.ratingDate;
+
+
+
                 }
 
 
@@ -189,7 +208,8 @@ namespace InovaTrackApi_SBB.DataModel
                 _db.SaveChanges();
             }
 
-            switch (returnMode) {
+            switch (returnMode)
+            {
                 case ReturnMode.Status:
                     return (get(shipmentId: status.shipmentId, imageInclude: imageInclude).Select(x => x.shipmentStatus).First());
 
@@ -351,6 +371,8 @@ namespace InovaTrackApi_SBB.DataModel
             public DateTime? arrivalTime { get; set; }
             public DateTime? beginUnloadingTime { get; set; }
             public DateTime? unloadingByDriver { get; set; }
+            public decimal? unloadingByDriverLat { get; set; }
+            public decimal? unloadingByDriverlon { get; set; }
             public string podRecipientName { get; set; }
             public DateTime? podTime { get; set; }
             public string podFile1 { get; set; }
@@ -358,6 +380,11 @@ namespace InovaTrackApi_SBB.DataModel
             public DateTime? returningTime { get; set; }
             public DateTime? availableTime { get; set; }
             public bool? isEmergency { get; set; }
+            public string customerName { get; set; }
+            public string projectName { get; set; }
+            public byte? rating { get; set; }
+            public string ratingNote { get; set; }
+            public DateTime? ratingDate { get; set; }
 
         }
 
@@ -409,6 +436,20 @@ namespace InovaTrackApi_SBB.DataModel
             public int shipmentId { get; set; }
             public string file { get; set; }
             public string note { get; set; }
+        }
+
+        public class ConfirmUnloadingInput
+        {
+            public int shipmentId { get; set; }
+            public decimal? unloadingByDriverLat { get; set; }
+            public decimal? unloadingByDriverlon { get; set; }
+        }
+
+        public class RattingInput
+        {
+            public int shipmentId { get; set; }
+            public byte? rating { get; set; }
+            public string ratingNote { get; set; }
         }
 
         public enum ReturnMode

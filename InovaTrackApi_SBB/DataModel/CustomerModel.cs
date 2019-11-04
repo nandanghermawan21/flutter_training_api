@@ -46,7 +46,6 @@ namespace InovaTrackApi_SBB.DataModel
 
             return data;
         }
-
         public List<Customer> get(int? userId)
         {
             IQueryable<Customer> qCustomer = _db.Customers;
@@ -59,7 +58,6 @@ namespace InovaTrackApi_SBB.DataModel
             return data;
 
         }
-
         public Customer update(Customer customer)
         {
             var data = _db.Customers.FirstOrDefault(x => x.CustomerId == customer.CustomerId);
@@ -81,7 +79,5 @@ namespace InovaTrackApi_SBB.DataModel
 
             return get(userId: Convert.ToInt32(data.CustomerId)).First();
         }
-
-
     }
 }

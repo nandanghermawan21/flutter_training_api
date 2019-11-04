@@ -36,6 +36,8 @@ namespace InovaTrackApi_SBB.Helper
             public string waiting = "Waiting";
             public string emailOrPasswordInCorrect = "email or password incorrect";
             public string thisUserIsNotPermitted = "This user is not permitted";
+            public string confirmed = "Confirmed";
+            public string pod = "Proof Of Delivery";
         }
         #endregion
 
@@ -97,6 +99,8 @@ namespace InovaTrackApi_SBB.Helper
                     returnning = "Kembali ke Plant",
                     completed = "Complete",
                     thisUserIsNotPermitted = "User ini tidak diizinkan",
+                    confirmed = "Terkonfirmasi",
+                    pod = "Serah Terima",
                 };
             }
         }

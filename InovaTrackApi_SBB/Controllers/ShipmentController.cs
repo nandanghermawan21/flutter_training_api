@@ -225,5 +225,49 @@ namespace InovaTrackApi_SBB.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
+
+        [Route("rating")]
+        [HttpPost]
+        public ActionResult shipmentRating(RattingInput shipmentRating)
+        {
+            try
+            {
+                ShipmentStatus status = JsonConvert.DeserializeObject<ShipmentStatus>(JsonConvert.SerializeObject(shipmentRating));
+
+                status.ratingDate = DateTime.Now;
+
+                var data = _shipmentModel.updateStatus(status,
+                    mode: 2,
+                    imageInclude: true);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+
+        [Route("confirmUnloading")]
+        [HttpPost]
+        public ActionResult confirmUnloading(ConfirmUnloadingInput confirmUnloading)
+        {
+            try
+            {
+                ShipmentStatus status = JsonConvert.DeserializeObject<ShipmentStatus>(JsonConvert.SerializeObject(confirmUnloading));
+
+                status.unloadingByDriver = DateTime.Now;
+
+                var data = _shipmentModel.updateStatus(status,
+                    mode: 2,
+                    imageInclude: true);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
     }
 }
