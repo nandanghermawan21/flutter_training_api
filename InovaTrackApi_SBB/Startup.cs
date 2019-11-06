@@ -109,6 +109,7 @@ namespace InovaTrackApi_SBB
                 x.SwaggerEndpoint("../swagger/v1/swagger.json", "SBI Core API");
             });
 
+           
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

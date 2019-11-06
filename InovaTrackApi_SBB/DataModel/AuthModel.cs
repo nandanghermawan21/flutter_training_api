@@ -12,6 +12,7 @@ namespace InovaTrackApi_SBB.DataModel
             public const string customer = "C";
             public const string sales = "S";
             public const string driver = "D";
+            public const string qc = "Q";
         }
 
         public class ProfileModel

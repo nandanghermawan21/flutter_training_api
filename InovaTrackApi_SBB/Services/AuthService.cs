@@ -17,6 +17,8 @@ namespace InovaTrackApi_SBB.Services
         Customer AuthenticateCustomer(string email, string password);
         Sales AuthenticateSales(string email, string password);
         Driver AuthenticateDriver(string email, string password);
+        QcMaster AuthenticateQc(string email, string password);
+
     }
 
     public class AuthService : IAuthService
@@ -174,5 +176,38 @@ namespace InovaTrackApi_SBB.Services
 
             return driver;
         }
-    }
-}
+
+        public QcMaster AuthenticateQc(string email, string password)
+        {
+            var hash = PasswordHasher.Hash("", password);
+            var qc = db.QcMasters.FirstOrDefault(x => x.email == email && x.password == hash);
+
+            // return null if user not found
+            if (qc == null)
+                return null;
+
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var expiredTime = DateTime.UtcNow.AddDays(7);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Sid, qc.nik.ToString()),
+                    new Claim(ClaimTypes.Actor, "Q" /*code source untuk driver*/),
+                    new Claim(ClaimTypes.MobilePhone, qc.phone ?? ""),
+                }),
+                Expires = expiredTime,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            qc.Token = tokenHandler.WriteToken(token);
+
+            // remove password before returning
+            qc.password = null;
+            qc.TokenExpiredTime = expiredTime;
+
+            return qc;
+        }
+    }}

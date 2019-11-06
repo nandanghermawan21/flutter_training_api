@@ -89,5 +89,22 @@ namespace InovaTrackApi_SBB.Controllers
             return Ok(driver);
         }
 
+        [Route("qc-login")]
+        [HttpPost]
+        public ActionResult QcLogin([FromBody]UserLoginModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var driver = authService.AuthenticateQc(request.UserName, request.Password);
+
+            if (driver == null)
+                return BadRequest(GlobalData.get.resource.emailOrPasswordInCorrect);
+
+            driver.password = null;
+            return Ok(driver);
+        }
+
+
     }
 }

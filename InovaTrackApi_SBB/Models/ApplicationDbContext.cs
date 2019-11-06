@@ -35,5 +35,8 @@ namespace InovaTrackApi_SBB.Models
         public DbSet<VisitLog> VisitLogs { get; set; }
         public DbSet<Sales> Saleses { get; set; }
         public DbSet<SalesCustomer> salesCustomers { get; set; }
+        public DbSet<QcHeader> qcHeaders { get; set; }
+        public DbSet<QcDetail> qcDetails { get; set; }
+        public DbSet<QcMaster> QcMasters { get; set; }
     }
 }

@@ -55,6 +55,7 @@ namespace InovaTrackApi_SBB.DataModel
                         let volumeCount = _db.SAPShipments.Where(x => x.shipment_no == project.sap_shipment_no).Sum(x => x.kirim_quantity)
                         let totalshipment = _db.SAPShipments.FirstOrDefault(x => x.shipment_no == project.sap_shipment_no).shipment_interval
                         let paidOf = _db.peojectPayments.Where(x => x.project_id == project.id && x.status == 1).Sum(x => x.paid_amount)
+                        let qcTestCount = _db.qcHeaders.Where(x => x.projectId == project.id).Count()
                         select new ResponseModel()
                         {
                             id = project.id,
@@ -99,6 +100,7 @@ namespace InovaTrackApi_SBB.DataModel
                             customerName = customer.CustomerName,
                             customerAvatar =  $@"{_config.DownloadBaseUrl}\{customer.customerAvatar}",
                             salesId = project.sales_id,
+                            qcTestCount = qcTestCount,
                         }).ToList();
 
             return data;
@@ -246,6 +248,7 @@ namespace InovaTrackApi_SBB.DataModel
             public string customerName { get; set; }
             public string customerAvatar { get; set; }
             public string salesId { get; set; }
+            public int qcTestCount { get; set; }
         }
     }
 }
