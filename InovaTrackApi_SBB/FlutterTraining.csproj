@@ -10,6 +10,21 @@
     <Content Remove="Resources\**" />
     <EmbeddedResource Remove="Resources\**" />
     <None Remove="Resources\**" />
+    <Compile Remove="Controllers\BatchingPlantController.cs" />
+    <Compile Remove="Controllers\ProjectController.cs" />
+    <Compile Remove="Controllers\PageController.cs" />
+    <Compile Remove="Controllers\PaymentController.cs" />
+    <Compile Remove="Controllers\SalesTargetReportController.cs" />
+    <Compile Remove="Controllers\ShipmentController.cs" />
+    <Compile Remove="Controllers\SalesController.cs" />
+    <Compile Remove="Controllers\CustomerController.cs" />
+    <Compile Remove="Controllers\QcAccountController.cs" />
+    <Compile Remove="Controllers\TimeSlotController.cs" />
+    <Compile Remove="Controllers\ProductController.cs" />
+    <Compile Remove="Controllers\VisitController.cs" />
+    <Compile Remove="Controllers\ControlleBase.cs" />
+    <Compile Remove="Controllers\QcController.cs" />
+    <Compile Remove="Controllers\DriverController.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +49,13 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Examples" Version="2.9.0" />
     <PackageReference Include="System.ObjectModel" Version="4.3.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.1" />
+    <PackageReference Include="FluentValidation.WebApi" Version="8.5.1" />
+    <PackageReference Include="FluentValidation.Mvc5" Version="8.5.1" />
+    <PackageReference Include="FluentValidation" Version="8.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataModel\" />
+  </ItemGroup>
 </Project>
