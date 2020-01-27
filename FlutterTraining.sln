@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InovaTrackApi_SBB", "InovaTrackApi_SBB\InovaTrackApi_SBB.csproj", "{38B7CE4A-A2B0-4C4B-9B77-4B63ACE173D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlutterTraining", "InovaTrackApi_SBB\FlutterTraining.csproj", "{38B7CE4A-A2B0-4C4B-9B77-4B63ACE173D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
